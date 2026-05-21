@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Godot &amp; Fils — Formation Métier</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;background:#f0f2f5;color:#1a1a1a;min-height:100vh}
+.app{max-width:880px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;background:#fff;box-shadow:0 0 40px rgba(0,0,0,.08)}
+.topbar{background:#1B2A4A;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.topbar-title{font-size:16px;font-weight:700;color:#C8A84B}
+.topbar-sub{font-size:11px;color:#aaa;margin-top:2px}
+.prog-wrap{height:4px;background:#2d3f5e}
+.prog-fill{height:100%;background:#C8A84B;transition:width .4s}
+.tabs{display:flex;gap:0;background:#1B2A4A;border-bottom:2px solid #C8A84B;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tab{padding:10px 16px;font-size:12px;font-weight:600;cursor:pointer;color:#aaa;border:none;background:transparent;white-space:nowrap;transition:all .15s;flex-shrink:0}
+.tab:hover{color:#fff;background:rgba(255,255,255,.06)}
+.tab.active{color:#C8A84B;background:#0f1e36;border-bottom:2px solid #C8A84B;margin-bottom:-2px}
+.tab.done::before{content:"✓ ";color:#7ec47e}
+.content{flex:1;padding:24px;background:#f8f9fb}
+
+/* LOGIN */
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:#f0f2f5;padding:20px}
+.login-card{background:#fff;border-radius:16px;padding:40px 36px;width:100%;max-width:420px;box-shadow:0 4px 24px rgba(0,0,0,.10)}
+.login-logo{text-align:center;margin-bottom:28px}
+.login-logo-title{font-size:26px;font-weight:700;color:#1B2A4A}
+.login-logo-sub{font-size:12px;color:#C8A84B;font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin-top:3px}
+.form-group{margin-bottom:16px}
+.form-label{font-size:12px;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;display:block}
+.form-input{width:100%;padding:12px 14px;border:1.5px solid #dde1e7;border-radius:8px;font-size:14px;color:#1a1a1a;background:#fafbfc;transition:border .15s;outline:none}
+.form-input:focus{border-color:#1B2A4A;background:#fff}
+.form-select{width:100%;padding:12px 14px;border:1.5px solid #dde1e7;border-radius:8px;font-size:14px;color:#1a1a1a;background:#fafbfc;outline:none;cursor:pointer}
+.form-select:focus{border-color:#1B2A4A}
+.btn-login{width:100%;padding:13px;background:#1B2A4A;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;margin-top:8px;transition:background .15s}
+.btn-login:hover{background:#243a64}
+.login-err{background:#fff5f5;border:1px solid #fbb;border-radius:7px;padding:10px 14px;font-size:13px;color:#a32d2d;margin-top:12px;display:none}
+.login-note{font-size:11px;color:#aaa;text-align:center;margin-top:16px}
+
+/* MANAGER */
+.mgr-hero{background:#1B2A4A;border-radius:10px;padding:20px 24px;margin-bottom:20px;color:#fff}
+.mgr-title{font-size:20px;font-weight:700;margin-bottom:4px}
+.mgr-sub{font-size:12px;color:#8fa3c0}
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+@media(max-width:600px){.stat-grid{grid-template-columns:repeat(2,1fr)}}
+.stat-card{background:#fff;border:1px solid #e0e4ea;border-radius:10px;padding:14px;text-align:center}
+.stat-num{font-size:26px;font-weight:700;color:#1B2A4A}
+.stat-lbl{font-size:11px;color:#888;margin-top:3px;font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+.agent-table{width:100%;border-collapse:collapse;font-size:12px;background:#fff;border-radius:10px;overflow:hidden;border:1px solid #e0e4ea}
+.agent-table th{background:#1B2A4A;color:#fff;padding:10px 12px;text-align:left;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+.agent-table td{padding:10px 12px;border-bottom:1px solid #f0f2f5;vertical-align:middle}
+.agent-table tr:last-child td{border-bottom:none}
+.agent-table tr:hover td{background:#f8f9fb}
+.pill{display:inline-flex;align-items:center;padding:3px 9px;border-radius:5px;font-size:11px;font-weight:700;white-space:nowrap}
+.p-green{background:#f0fae8;color:#27500A;border:1px solid #c0dd97}
+.p-amber{background:#fffbf0;color:#633806;border:1px solid #fac775}
+.p-red{background:#fff5f5;color:#7a1a1a;border:1px solid #f7c1c1}
+.p-grey{background:#f1efe8;color:#5f5e5a;border:1px solid #d3d1c7}
+.p-blue{background:#e6f1fb;color:#0c447c;border:1px solid #b5d4f4}
+.det-btn{font-size:11px;padding:4px 10px;background:#e6f1fb;color:#0c447c;border:1px solid #b5d4f4;border-radius:5px;cursor:pointer;font-weight:600}
+.det-btn:hover{background:#d0e7f8}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:1000;padding:20px}
+.modal{background:#fff;border-radius:14px;padding:28px;max-width:600px;width:100%;max-height:85vh;overflow-y:auto;box-shadow:0 8px 40px rgba(0,0,0,.18)}
+.modal-title{font-size:17px;font-weight:700;color:#1B2A4A;margin-bottom:4px}
+.modal-sub{font-size:12px;color:#888;margin-bottom:20px}
+.modal-close{float:right;background:none;border:none;font-size:20px;cursor:pointer;color:#aaa;line-height:1;padding:0 0 4px 8px}
+.mod-result{border:1px solid #e0e4ea;border-radius:8px;padding:14px;margin-bottom:10px;background:#fafbfc}
+.mod-result-title{font-size:13px;font-weight:700;color:#1B2A4A;margin-bottom:8px}
+.attempt-row{display:flex;align-items:center;gap:8px;font-size:12px;color:#555;padding:5px 0;border-bottom:1px solid #f0f2f5}
+.attempt-row:last-child{border-bottom:none}
+.btn-reset-agent{font-size:11px;padding:4px 10px;background:#fff5f5;color:#7a1a1a;border:1px solid #fbb;border-radius:5px;cursor:pointer;font-weight:600;margin-top:10px}
+
+/* APP */
+.hero{background:#1B2A4A;border-radius:10px;padding:20px 24px;margin-bottom:22px;color:#fff}
+.hero-code{font-size:10px;color:#C8A84B;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px}
+.hero-title{font-size:21px;font-weight:700;margin-bottom:4px}
+.hero-meta{font-size:12px;color:#8fa3c0;display:flex;gap:16px;flex-wrap:wrap}
+.section-title{font-size:12px;font-weight:700;color:#1B2A4A;margin-bottom:12px;padding-bottom:7px;border-bottom:2px solid #C8A84B;text-transform:uppercase;letter-spacing:.05em}
+.card{background:#fff;border:1px solid #e0e4ea;border-radius:10px;padding:16px;margin-bottom:12px}
+.step-row{display:flex;gap:12px;align-items:flex-start;padding:9px 0;border-bottom:1px solid #f0f2f5}
+.step-row:last-child{border-bottom:none}
+.step-num{min-width:28px;height:28px;border-radius:50%;background:#1B2A4A;color:#C8A84B;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.step-label{font-size:13px;font-weight:600;color:#1B2A4A;margin-bottom:2px}
+.step-detail{font-size:12px;color:#555;line-height:1.6}
+.alert-box{border-left:4px solid #e24b4a;background:#fff5f5;border-radius:0 8px 8px 0;padding:11px 15px;margin:12px 0;font-size:12px;color:#7a1a1a;font-style:italic;line-height:1.6}
+.info-box{border-left:4px solid #C8A84B;background:#fffbf0;border-radius:0 8px 8px 0;padding:11px 15px;margin:12px 0;font-size:12px;color:#5a4010;line-height:1.6}
+.ok-box{border-left:4px solid #639922;background:#f0fae8;border-radius:0 8px 8px 0;padding:11px 15px;margin:12px 0;font-size:12px;color:#2d5a0e;line-height:1.6}
+.tbl{width:100%;border-collapse:collapse;font-size:12px;border-radius:8px;overflow:hidden;border:1px solid #e0e4ea}
+.tbl th{background:#1B2A4A;color:#fff;padding:9px 12px;text-align:left;font-weight:700;font-size:11px}
+.tbl td{padding:8px 12px;border-bottom:1px solid #f0f2f5;color:#333;line-height:1.5}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:nth-child(even) td{background:#f8f9fb}
+.tbl .c-green{background:#f0fae8!important;color:#2d5a0e;font-weight:700}
+.tbl .c-amber{background:#fffbf0!important;color:#5a4010;font-weight:700}
+.tbl .c-orange{background:#fff5e6!important;color:#7a3500;font-weight:700}
+.tbl .c-red{background:#fff5f5!important;color:#7a1a1a;font-weight:700}
+.btn{padding:10px 20px;border-radius:8px;border:1px solid #dde1e7;background:#fff;color:#1B2A4A;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s}
+.btn:hover{background:#f0f2f5}
+.btn-primary{background:#1B2A4A;color:#fff;border-color:#1B2A4A}
+.btn-primary:hover{background:#243a64}
+.btn-gold{background:#C8A84B;color:#1B2A4A;border-color:#C8A84B;font-weight:700}
+.btn-gold:hover{background:#b8983b}
+.btn-row{display:flex;gap:10px;justify-content:flex-end;margin-top:22px;flex-wrap:wrap}
+.quiz-q{background:#fff;border:1px solid #e0e4ea;border-radius:10px;padding:18px;margin-bottom:14px}
+.quiz-qnum{font-size:11px;color:#999;margin-bottom:6px;font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+.quiz-qtxt{font-size:14px;font-weight:700;color:#1B2A4A;margin-bottom:14px;line-height:1.5}
+.quiz-opt{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:8px;border:1px solid #e0e4ea;margin-bottom:8px;cursor:pointer;transition:all .15s;font-size:13px;background:#fafbfc;color:#333}
+.quiz-opt:hover{border-color:#1B2A4A;background:#f0f4ff}
+.quiz-opt.selected{border-color:#1B2A4A;background:#e8edf8;color:#1B2A4A;font-weight:600}
+.quiz-opt.correct{border-color:#639922;background:#f0fae8;color:#2d5a0e;font-weight:700}
+.quiz-opt.wrong{border-color:#e24b4a;background:#fff5f5;color:#7a1a1a}
+.radio{width:18px;height:18px;border-radius:50%;border:2px solid #c0c5cc;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.radio.filled{background:#1B2A4A;border-color:#1B2A4A}
+.radio.filled::after{content:'';width:7px;height:7px;background:#C8A84B;border-radius:50%}
+.radio.cr{background:#639922;border-color:#639922;color:#fff;font-size:11px;font-weight:700}
+.radio.cr::after{content:'✓'}
+.radio.wr{background:#e24b4a;border-color:#e24b4a;color:#fff;font-size:11px;font-weight:700}
+.radio.wr::after{content:'✗'}
+.score-wrap{text-align:center;padding:28px 0 20px}
+.score-circle{width:110px;height:110px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto 16px;border:4px solid}
+.sc-pass{border-color:#639922;background:#f0fae8}
+.sc-fail{border-color:#e24b4a;background:#fff5f5}
+.sc-num{font-size:32px;font-weight:700}
+.sc-sub{font-size:12px;color:#777;margin-top:2px}
+.home-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:22px}
+@media(max-width:500px){.home-grid{grid-template-columns:1fr}}
+.mc{background:#fff;border:1px solid #e0e4ea;border-radius:10px;padding:16px;cursor:pointer;transition:all .15s}
+.mc:hover{border-color:#1B2A4A;transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.08)}
+.mc.done{border-left:4px solid #639922}
+.mc.locked{opacity:.55;cursor:not-allowed}
+.mc-code{font-size:10px;font-weight:700;color:#C8A84B;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px}
+.mc-title{font-size:14px;font-weight:700;color:#1B2A4A;margin-bottom:3px}
+.mc-meta{font-size:11px;color:#888}
+.mc-status{font-size:11px;margin-top:8px;font-weight:700}
+.pochette{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:8px;margin-bottom:6px;border:1px solid #e0e4ea;background:#fafbfc}
+.pswatch{width:20px;height:20px;border-radius:4px;border:1px solid rgba(0,0,0,.1);flex-shrink:0}
+.signal{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid #f0f2f5;align-items:flex-start}
+.signal:last-child{border-bottom:none}
+.sname{font-size:12px;font-weight:700;color:#1B2A4A;margin-bottom:1px}
+.sdesc{font-size:12px;color:#555;line-height:1.5}
+.attempts-bar{background:#f0f2f5;border-radius:6px;padding:8px 12px;font-size:12px;color:#555;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.att-dot{width:10px;height:10px;border-radius:50%}
+.att-used{background:#e24b4a}
+.att-avail{background:#c0dd97}
+.cert-box{background:#1B2A4A;border-radius:12px;padding:28px;text-align:center;color:#fff;margin-bottom:20px}
+.cert-title{font-size:22px;font-weight:700;color:#C8A84B;margin-bottom:8px}
+.cert-sub{font-size:13px;color:#8fa3c0;line-height:1.6}
+.ed-wrap{padding:0 0 20px}
+.ed-toolbar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:18px}
+.ed-title{font-size:18px;font-weight:700;color:#1B2A4A}
+.ed-list{display:flex;flex-direction:column;gap:8px;margin-bottom:20px}
+.ed-card{background:#fff;border:1px solid #e0e4ea;border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:all .15s}
+.ed-card:hover{border-color:#1B2A4A;box-shadow:0 2px 8px rgba(0,0,0,.07)}
+.ed-card.built-in{border-left:4px solid #1B2A4A}
+.ed-card.custom{border-left:4px solid #C8A84B}
+.ed-card-code{font-size:10px;font-weight:700;color:#C8A84B;letter-spacing:.08em;text-transform:uppercase;min-width:36px}
+.ed-card-title{font-size:13px;font-weight:600;color:#1B2A4A;flex:1}
+.ed-card-meta{font-size:11px;color:#888}
+.ed-card-actions{display:flex;gap:6px;margin-left:auto}
+.ed-btn-sm{padding:5px 10px;border-radius:6px;border:1px solid #e0e4ea;background:#f8f9fb;font-size:11px;font-weight:600;cursor:pointer;color:#1B2A4A;transition:all .15s}
+.ed-btn-sm:hover{background:#e8edf8;border-color:#1B2A4A}
+.ed-btn-sm.danger{color:#a32d2d;border-color:#fbb;background:#fff5f5}
+.ed-btn-sm.danger:hover{background:#fdecea}
+.ed-form{background:#fff;border:1px solid #e0e4ea;border-radius:12px;padding:20px}
+.ed-form-group{margin-bottom:16px}
+.ed-form-label{font-size:12px;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;display:block}
+.ed-form-input{width:100%;padding:10px 12px;border:1.5px solid #dde1e7;border-radius:8px;font-size:13px;color:#1a1a1a;background:#fafbfc;outline:none;font-family:inherit;transition:border .15s}
+.ed-form-input:focus{border-color:#1B2A4A;background:#fff}
+.ed-form-textarea{width:100%;padding:10px 12px;border:1.5px solid #dde1e7;border-radius:8px;font-size:13px;color:#1a1a1a;background:#fafbfc;outline:none;font-family:inherit;resize:vertical;min-height:120px;line-height:1.6;transition:border .15s}
+.ed-form-textarea:focus{border-color:#1B2A4A;background:#fff}
+.ed-form-select{width:100%;padding:10px 12px;border:1.5px solid #dde1e7;border-radius:8px;font-size:13px;color:#1a1a1a;background:#fafbfc;outline:none;font-family:inherit;cursor:pointer}
+.ed-section-item{background:#f8f9fb;border:1px solid #e8ecf1;border-radius:8px;padding:12px;margin-bottom:10px}
+.ed-section-item-header{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.ed-section-num{font-size:11px;font-weight:700;color:#1B2A4A;background:#e8edf8;padding:2px 7px;border-radius:4px}
+.ed-quiz-item{background:#f8f9fb;border:1px solid #e8ecf1;border-radius:8px;padding:12px;margin-bottom:10px}
+.ed-quiz-num{font-size:11px;font-weight:700;color:#C8A84B;background:#fffbf0;padding:2px 7px;border-radius:4px;margin-bottom:8px;display:inline-block}
+.ed-tabs-inner{display:flex;gap:4px;margin-bottom:16px;border-bottom:1px solid #e0e4ea;padding-bottom:0}
+.ed-tab-inner{padding:8px 16px;font-size:12px;font-weight:600;cursor:pointer;color:#888;border:none;background:transparent;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s}
+.ed-tab-inner.active{color:#1B2A4A;border-bottom-color:#C8A84B}
+.ed-preview{background:#f8f9fb;border:1px solid #e0e4ea;border-radius:8px;padding:16px;font-size:13px;color:#333;line-height:1.7;min-height:80px}
+.hint{font-size:11px;color:#aaa;margin-top:4px;font-style:italic}
+</style>
+</head>
+<body>
+
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login-wrap" id="login-wrap">
+<div class="login-card">
+  <div class="login-logo">
+    <div class="login-logo-title">Godot &amp; Fils</div>
+    <div class="login-logo-sub">Formation Métier · SAS FORTUNAQUI</div>
+  </div>
+  <div class="form-group">
+    <label class="form-label" for="inp-nom">Nom et Prénom</label>
+    <input class="form-input" id="inp-nom" type="text" placeholder="Ex : Marie Dupont" autocomplete="name">
+  </div>
+  <div class="form-group">
+    <label class="form-label" for="inp-poste">Poste</label>
+    <select class="form-select" id="inp-poste">
+      <option value="">-- Sélectionner --</option>
+      <option>Agent de comptoir</option>
+      <option>Responsable boutique</option>
+      <option>Responsable Conformité</option>
+      <option>Directeur(trice)</option>
+      <option>Stagiaire</option>
+      <option>Autre</option>
+    </select>
+  </div>
+  <div class="form-group">
+    <label class="form-label" for="inp-pwd">Code d'accès</label>
+    <input class="form-input" id="inp-pwd" type="password" placeholder="Code fourni par votre responsable">
+  </div>
+  <button class="btn-login" onclick="doLogin()">Accéder à la formation</button>
+  <div class="login-err" id="login-err">Nom, poste et code d'accès requis.</div>
+  <div class="login-note">Formation interne confidentielle — SAS FORTUNAQUI · Perpignan</div>
+</div>
+</div>
+
+<!-- APP -->
+<div class="app" id="app-wrap" style="display:none">
+<div class="topbar">
+  <div>
+    <div class="topbar-title">Godot &amp; Fils — Formation Métier</div>
+    <div class="topbar-sub" id="user-label"></div>
+  </div>
+  <div style="display:flex;align-items:center;gap:10px">
+    <div id="top-badge" class="pill p-amber"></div>
+    <button onclick="doLogout()" style="background:none;border:1px solid #3d5a80;color:#8fa3c0;padding:5px 10px;border-radius:6px;font-size:11px;cursor:pointer;font-weight:600">Déconnexion</button>
+  </div>
+</div>
+<div class="prog-wrap"><div class="prog-fill" id="prog" style="width:0%"></div></div>
+<div class="tabs" id="tabs"></div>
+<div class="content" id="content"></div>
+</div>
+
+
+<script>
+const MODS=[{"id": "m1", "code": "M1", "title": "Change Manuel", "dur": "3h", "level": "Débutant → Confirmé", "sections": [{"t": "Fondamentaux du change", "html": "<div class=\"card\"><div class=\"step-label\">Qu'est-ce que le change manuel ?</div><div class=\"step-detail\" style=\"margin-top:5px\">Le change manuel est l'échange physique de billets étrangers contre des euros en boutique. SAS FORTUNAQUI est agréée changeur manuel par l'ACPR — obligation légale.</div></div><div class=\"info-box\"><strong>Devises courantes à Perpignan :</strong> GBP · USD · CHF · NOK · AED · MXN · CAD · JPY</div><div class=\"section-title\">Comment lire un cours de change</div><table class=\"tbl\"><thead><tr><th>Type</th><th>Définition</th><th>Exemple EUR/GBP=0,85</th></tr></thead><tbody><tr><td>Cours ECB</td><td>Taux officiel BCE</td><td>1€ = 0,850 GBP</td></tr><tr><td class=\"c-green\">Cours achat</td><td>Boutique achète vos devises</td><td>1€ = 0,830 GBP</td></tr><tr><td class=\"c-red\">Cours vente</td><td>Boutique vend des devises</td><td>1€ = 0,870 GBP</td></tr></tbody></table>"}, {"t": "Procédure et seuils", "html": "<div class=\"alert-box\">🔴 POLITIQUE FORTUNAQUI : Identification obligatoire DÈS LE 1ER CENTIME.</div><div class=\"card\"><div class=\"step-row\"><div class=\"step-num\">1</div><div class=\"step-body\"><div class=\"step-label\">Accueil</div><div class=\"step-detail\">Identifier le sens (achat/vente) et la devise.</div></div></div><div class=\"step-row\"><div class=\"step-num\">2</div><div class=\"step-body\"><div class=\"step-label\">Vérification billets</div><div class=\"step-detail\">Lampe UV pour tout billet ≥ 20 €. Refus immédiat si suspect.</div></div></div><div class=\"step-row\"><div class=\"step-num\">3</div><div class=\"step-body\"><div class=\"step-label\">Annonce du cours</div><div class=\"step-detail\">Calculer et annoncer AVANT la transaction. Accord client obligatoire.</div></div></div><div class=\"step-row\"><div class=\"step-num\">4</div><div class=\"step-body\"><div class=\"step-label\">Identification client</div><div class=\"step-detail\">Selon les seuils ci-dessous — aucune exception.</div></div></div><div class=\"step-row\"><div class=\"step-num\">5</div><div class=\"step-body\"><div class=\"step-label\">Registre de change</div><div class=\"step-detail\">Inscrire toutes les opérations ≥ 1 000 €.</div></div></div><div class=\"step-row\"><div class=\"step-num\">6</div><div class=\"step-body\"><div class=\"step-label\">Remise des fonds</div><div class=\"step-detail\">Compter DEVANT le client à voix haute. Remettre la facture.</div></div></div><div class=\"step-row\"><div class=\"step-num\">7</div><div class=\"step-body\"><div class=\"step-label\">Clôture caisse</div><div class=\"step-detail\">Équilibrer en fin de journée.</div></div></div></div><div class=\"section-title\">Seuils FORTUNAQUI</div><table class=\"tbl\"><thead><tr><th>Montant</th><th>Obligation</th><th>Base légale</th></tr></thead><tbody><tr><td class=\"c-green\">0–800 €</td><td>Facture nominative (nom, prénom, date/lieu naissance, nationalité)</td><td>Politique interne</td></tr><tr><td class=\"c-amber\">800–1 000 €</td><td>Pièce d'identité valide obligatoire</td><td>Politique interne</td></tr><tr><td class=\"c-orange\">1 000–10 000 €</td><td>Pièce ID + registre de change</td><td>Art. L.561-2 (8°) CMF</td></tr><tr><td class=\"c-red\">≥ 10 000 €</td><td>KYC complet + justificatif origine fonds + validation RC</td><td>Vigilance renforcée CMF</td></tr></tbody></table>"}, {"t": "GAFI & Soupçons Tracfin", "html": "<table class=\"tbl\"><thead><tr><th>Liste GAFI</th><th>Signification</th><th>Conduite</th></tr></thead><tbody><tr><td class=\"c-red\">Noire</td><td>Défaillances graves (Corée du Nord, Iran…)</td><td class=\"c-red\">REFUS SYSTÉMATIQUE</td></tr><tr><td class=\"c-amber\">Grise</td><td>Sous surveillance — màj juin et octobre</td><td>Vigilance renforcée + documentation</td></tr><tr><td class=\"c-green\">Hors liste</td><td>Pays conformes GAFI</td><td>Procédure standard</td></tr></tbody></table><div class=\"section-title\" style=\"margin-top:16px\">Signaux d'alerte</div><div class=\"card\"><div class=\"signal\"><div style=\"font-size:15px;flex-shrink:0\">⚠️</div><div><div class=\"sname\">Fractionnement</div><div class=\"sdesc\">Retours multiples pour rester sous 1 000 €</div></div></div><div class=\"signal\"><div style=\"font-size:15px;flex-shrink:0\">⚠️</div><div><div class=\"sname\">Incohérence profil</div><div class=\"sdesc\">Montant incompatible avec le profil du client</div></div></div><div class=\"signal\"><div style=\"font-size:15px;flex-shrink:0\">⚠️</div><div><div class=\"sname\">Pression/Nervosité</div><div class=\"sdesc\">Refuse son identité, questions sur les seuils</div></div></div><div class=\"signal\"><div style=\"font-size:15px;flex-shrink:0\">⚠️</div><div><div class=\"sname\">Petites coupures usées</div><div class=\"sdesc\">Nombreuses petites coupures — typique des trafics</div></div></div></div><div class=\"alert-box\">🔴 SOUPÇON : (1) Rester calme (2) Refuser poliment (3) Note Interne RC dans l'heure (4) JAMAIS informer le client — tipping-off = délit pénal.</div>"}], "quiz": [{"q": "Quel est le seuil légal d'identification pour le change selon le CMF ?", "o": ["500 €", "1 000 €", "3 000 €", "10 000 €"], "a": 1}, {"q": "La politique interne FORTUNAQUI impose une identification dès :", "o": ["500 €", "800 €", "1 €", "1 000 €"], "a": 2}, {"q": "Un client revient 4 fois dans la journée avec de petits montants. C'est :", "o": ["Client régulier", "Fractionnement suspect", "Change de routine", "Aucune anomalie"], "a": 1}, {"q": "Les listes GAFI sont mises à jour :", "o": ["Chaque mois", "Tous les ans", "En juin et octobre", "Chaque trimestre"], "a": 2}, {"q": "En cas de soupçon, la bonne procédure est :", "o": ["Confronter le client", "Demander de revenir", "Note RC, refus poli, ne jamais informer le client", "Refuser sans rien noter"], "a": 2}, {"q": "Le registre de change est contrôlable par :", "o": ["La mairie", "L'ACPR", "Les clients", "La préfecture"], "a": 1}, {"q": "Le cours d'achat est :", "o": ["Le taux ECB", "Le taux où la boutique achète vos devises", "Le plus favorable pour le client", "Identique au cours vente"], "a": 1}, {"q": "Un client veut changer 15 000 € sans justifier l'origine des fonds :", "o": ["Accepter — légal", "Refuser + procédure RC/Tracfin", "Demander de revenir avec moins", "Accepter avec pièce ID seulement"], "a": 1}]}, {"id": "m2", "code": "M2", "title": "Rachat de Fonte", "dur": "4h", "level": "Débutant → Confirmé", "sections": [{"t": "Identification des métaux", "html": "<table class=\"tbl\"><thead><tr><th>Carats</th><th>Pureté ‰</th><th>Objets typiques</th><th>Poinçon FR</th></tr></thead><tbody><tr><td class=\"c-amber\">9 ct</td><td>375‰</td><td>Bijoux UK, Espagne, Irlande</td><td>Coquille Saint-Jacques</td></tr><tr><td class=\"c-amber\">14 ct</td><td>585‰</td><td>Bijoux américains, est-européens</td><td>Tête de cheval</td></tr><tr><td class=\"c-amber\">18 ct</td><td>750‰</td><td>Bijouterie fine française</td><td>Aigle (tête)</td></tr><tr><td class=\"c-amber\">22 ct</td><td>916‰</td><td>Bijoux indiens, turcs, Krugerrand</td><td>—</td></tr><tr><td class=\"c-amber\">24 ct</td><td>999‰</td><td>Lingots uniquement</td><td>—</td></tr></tbody></table><div class=\"section-title\" style=\"margin-top:16px\">Code couleur pochettes</div><div class=\"pochette\"><div class=\"pswatch\" style=\"background:#EDE9F5\"></div><strong style=\"color:#5B2D91;font-size:12px;min-width:100px\">Violet</strong><span style=\"font-size:12px;color:#555\">9 ct (375‰)</span></div><div class=\"pochette\"><div class=\"pswatch\" style=\"background:#D6EAF8\"></div><strong style=\"color:#0C447C;font-size:12px;min-width:100px\">Bleu clair</strong><span style=\"font-size:12px;color:#555\">14 ct (585‰)</span></div><div class=\"pochette\"><div class=\"pswatch\" style=\"background:#FDEBD0\"></div><strong style=\"color:#7D3C00;font-size:12px;min-width:100px\">Orange</strong><span style=\"font-size:12px;color:#555\">16 ct (666‰)</span></div><div class=\"pochette\"><div class=\"pswatch\" style=\"background:#FFF9C4\"></div><strong style=\"color:#7A6000;font-size:12px;min-width:100px\">Jaune</strong><span style=\"font-size:12px;color:#555\">18 ct (750‰)</span></div><div class=\"pochette\"><div class=\"pswatch\" style=\"background:#FCE4EC\"></div><strong style=\"color:#880E4F;font-size:12px;min-width:100px\">Rose clair</strong><span style=\"font-size:12px;color:#555\">20 ct (833‰)</span></div><div class=\"pochette\"><div class=\"pswatch\" style=\"background:#F8BBD0\"></div><strong style=\"color:#AD1457;font-size:12px;min-width:100px\">Rose fuchsia</strong><span style=\"font-size:12px;color:#555\">22 ct (916‰)</span></div><div class=\"pochette\"><div class=\"pswatch\" style=\"background:#FFECB3\"></div><strong style=\"color:#B8860B;font-size:12px;min-width:100px\">Doré</strong><span style=\"font-size:12px;color:#555\">24 ct / 999‰</span></div>"}, {"t": "Analyse spectromètre et acides", "html": "<div class=\"ok-box\"><strong>Spectromètre XRF</strong> — méthode de référence. Non destructif, 30 secondes.<br><strong>Double test acide</strong> — obligatoire en cas de doute ou poinçon illisible.</div><div class=\"section-title\">Protocole XRF</div><div class=\"card\"><div class=\"step-row\"><div class=\"step-num\">1</div><div class=\"step-body\"><div class=\"step-label\">Calibrer en début de session</div><div class=\"step-detail\">Moins de 24h. Recalibrer si nécessaire.</div></div></div><div class=\"step-row\"><div class=\"step-num\">2</div><div class=\"step-body\"><div class=\"step-label\">Nettoyer la surface</div><div class=\"step-detail\">Chiffon doux. Résidus = erreur de 2-3%.</div></div></div><div class=\"step-row\"><div class=\"step-num\">3</div><div class=\"step-body\"><div class=\"step-label\">Positionner sur zone massive</div><div class=\"step-detail\">Éviter soudures, fermoirs, agrafes.</div></div></div><div class=\"step-row\"><div class=\"step-num\">4</div><div class=\"step-body\"><div class=\"step-label\">Déclencher la mesure</div><div class=\"step-detail\">10-30 sec. Lire le % Au et le titre.</div></div></div><div class=\"step-row\"><div class=\"step-num\">5</div><div class=\"step-body\"><div class=\"step-label\">Deux mesures divergentes > 3%</div><div class=\"step-detail\">Double test acide obligatoire.</div></div></div></div><div class=\"section-title\">Protocole acides</div><div class=\"alert-box\">⚠️ EPI OBLIGATOIRES : gants nitrile + lunettes de protection avant toute manipulation.</div><div class=\"card\"><div class=\"step-row\"><div class=\"step-num\">1</div><div class=\"step-body\"><div class=\"step-label\">EPI obligatoires</div><div class=\"step-detail\">Gants nitrile + lunettes.</div></div></div><div class=\"step-row\"><div class=\"step-num\">2</div><div class=\"step-body\"><div class=\"step-label\">Frotter sur pierre de touche</div><div class=\"step-detail\">Trait ferme de 2 cm.</div></div></div><div class=\"step-row\"><div class=\"step-num\">3</div><div class=\"step-body\"><div class=\"step-label\">Acide du titre suspecté</div><div class=\"step-detail\">1-2 gouttes. Observer 30 sec.</div></div></div><div class=\"step-row\"><div class=\"step-num\">4</div><div class=\"step-body\"><div class=\"step-label\">Interpréter</div><div class=\"step-detail\">Persiste = titre OK / Décolore = titre inférieur / Disparaît = métal de base.</div></div></div><div class=\"step-row\"><div class=\"step-num\">5</div><div class=\"step-body\"><div class=\"step-label\">Second test de confirmation</div><div class=\"step-detail\">Deux tests concordants = titre fiable.</div></div></div></div>"}, {"t": "Procédure de rachat", "html": "<div class=\"alert-box\">🔴 Identification obligatoire pour TOUT rachat — pièce d'identité TOUJOURS.</div><div class=\"card\"><div class=\"step-row\"><div class=\"step-num\">1</div><div class=\"step-body\"><div class=\"step-label\">Examen visuel</div><div class=\"step-detail\">Poinçons, état, éléments non-précieux à retirer.</div></div></div><div class=\"step-row\"><div class=\"step-num\">2</div><div class=\"step-body\"><div class=\"step-label\">Test du métal</div><div class=\"step-detail\">XRF + double acide si doute.</div></div></div><div class=\"step-row\"><div class=\"step-num\">3</div><div class=\"step-body\"><div class=\"step-label\">Pesée contradictoire</div><div class=\"step-detail\">Devant le client, balance certifiée.</div></div></div><div class=\"step-row\"><div class=\"step-num\">4</div><div class=\"step-body\"><div class=\"step-label\">Calcul du prix</div><div class=\"step-detail\">Poids brut × Titre × Cours spot × (1-Marge%). Expliquer au client.</div></div></div><div class=\"step-row\"><div class=\"step-num\">5</div><div class=\"step-body\"><div class=\"step-label\">Photo du lot</div><div class=\"step-detail\">AVANT d'accepter — intégrée à la facture.</div></div></div><div class=\"step-row\"><div class=\"step-num\">6</div><div class=\"step-body\"><div class=\"step-label\">Identification client</div><div class=\"step-detail\">Pièce ID + copie — TOUJOURS.</div></div></div><div class=\"step-row\"><div class=\"step-num\">7</div><div class=\"step-body\"><div class=\"step-label\">Livre de police</div><div class=\"step-detail\">Date, description, poids, titre, prix, identité, N° ID.</div></div></div><div class=\"step-row\"><div class=\"step-num\">8</div><div class=\"step-body\"><div class=\"step-label\">Bon de rachat signé</div><div class=\"step-detail\">2 exemplaires — signature AVANT paiement.</div></div></div><div class=\"step-row\"><div class=\"step-num\">9</div><div class=\"step-body\"><div class=\"step-label\">Formulaire rétractation</div><div class=\"step-detail\">Obligation légale.</div></div></div><div class=\"step-row\"><div class=\"step-num\">10</div><div class=\"step-body\"><div class=\"step-label\">Paiement</div><div class=\"step-detail\">Métaux précieux : virement UNIQUEMENT — Art. L.112-6 CMF. Espèces INTERDITES.</div></div></div></div><div class=\"info-box\">⏱️ <strong>Délai 48h :</strong> aucun lot ne peut être cassé ou envoyé avant 48h après le rachat.</div><div class=\"card\" style=\"background:#fffbf0;border-color:#e8c96a\"><strong>Formule prix de rachat :</strong><br>Poids pur = Poids brut × Titre (ex: 0,750)<br>Valeur théorique = Poids pur × Cours spot<br><strong>Prix = Valeur théorique × (1 − Marge%)</strong><br><br><em>Exemple : 10g × 0,750 × 85€/g × 0,80 = 510 €</em></div>"}], "quiz": [{"q": "Quel titre correspond à une pureté de 750‰ ?", "o": ["9 ct", "14 ct", "18 ct", "22 ct"], "a": 2}, {"q": "La couleur de pochette pour l'or 18 ct est :", "o": ["Violet", "Jaune", "Bleu clair", "Rose fuchsia"], "a": 1}, {"q": "Un trait qui disparaît au test acide signifie :", "o": ["Titre inférieur", "Métal de base ou plaqué", "Titre supérieur", "Test non concluant"], "a": 1}, {"q": "La pesée doit se faire :", "o": ["En arrière-boutique", "Devant le client sur balance certifiée", "Après signature", "Par un expert externe"], "a": 1}, {"q": "Le formulaire de rétractation est :", "o": ["Facultatif", "Obligatoire légalement", "Seulement pour professionnels", "Seulement > 1 000 €"], "a": 1}, {"q": "Client avec 20 bijoux dépareillés, accepte n'importe quel prix, nerveux :", "o": ["Client pressé normal", "Signal de recel → RC immédiat", "Bonne affaire", "Client professionnel"], "a": 1}, {"q": "Le paiement sur les métaux précieux se fait :", "o": ["En espèces", "Par virement uniquement — Art. L.112-6 CMF", "Au choix du client", "Par chèque certifié"], "a": 1}, {"q": "Le délai avant casse ou envoi fondeur est de :", "o": ["24h", "48h", "72h", "1 semaine"], "a": 1}]}, {"id": "m3", "code": "M3", "title": "Vente aux Professionnels", "dur": "3h", "level": "Confirmé", "sections": [{"t": "Préparation et expédition", "html": "<div class=\"card\"><div class=\"step-row\"><div class=\"step-num\">1</div><div class=\"step-body\"><div class=\"step-label\">Tri par métal</div><div class=\"step-detail\">Séparer or/argent/platine. Retirer TOUS les éléments non-précieux.</div></div></div><div class=\"step-row\"><div class=\"step-num\">2</div><div class=\"step-body\"><div class=\"step-label\">Pesée de contrôle</div><div class=\"step-detail\">Peser le lot brut. Consigner dans le bon de préparation.</div></div></div><div class=\"step-row\"><div class=\"step-num\">3</div><div class=\"step-body\"><div class=\"step-label\">Conditionnement</div><div class=\"step-detail\">Sachet hermétique étiqueté : N° lot, métal, poids, date, initiales.</div></div></div><div class=\"step-row\"><div class=\"step-num\">4</div><div class=\"step-body\"><div class=\"step-label\">Photo AVANT envoi</div><div class=\"step-detail\">Photographier le lot scellé. Archiver.</div></div></div><div class=\"step-row\"><div class=\"step-num\">5</div><div class=\"step-body\"><div class=\"step-label\">Bon de livraison</div><div class=\"step-detail\">N° lot, métal, poids, titre, destination, date.</div></div></div><div class=\"step-row\"><div class=\"step-num\">6</div><div class=\"step-body\"><div class=\"step-label\">Transporteur valeurs</div><div class=\"step-detail\">Déclaration de valeur = cours spot × poids pur. Reçu signé obligatoire.</div></div></div></div><div class=\"alert-box\">⚠️ LITIGE POIDS : demander le rapport d'analyse complet. Comparer avec la photo du lot scellé.</div>"}, {"t": "TVA et facturation", "html": "<table class=\"tbl\"><thead><tr><th>Type de bien</th><th>Régime TVA</th><th>Mention facture</th></tr></thead><tbody><tr><td class=\"c-green\">Or d'investissement</td><td class=\"c-green\">EXONÉRÉ</td><td>Art. 298 sexdecies A CGI</td></tr><tr><td class=\"c-amber\">Or/Argent brut, déchets</td><td>TVA sur la marge</td><td>Préciser le régime</td></tr><tr><td>Bijoux d'occasion</td><td>Régime de la marge</td><td>Art. 297A CGI</td></tr><tr><td>Platine, palladium brut</td><td>TVA 20%</td><td>Standard</td></tr></tbody></table><div class=\"section-title\" style=\"margin-top:16px\">Mentions obligatoires</div><div class=\"card\"><div class=\"signal\"><div style=\"color:#639922;font-size:14px;flex-shrink:0\">✓</div><div class=\"sdesc\">N° facture séquentiel</div></div><div class=\"signal\"><div style=\"color:#639922;font-size:14px;flex-shrink:0\">✓</div><div class=\"sdesc\">Date d'émission</div></div><div class=\"signal\"><div style=\"color:#639922;font-size:14px;flex-shrink:0\">✓</div><div class=\"sdesc\">SIRET + N° TVA SAS FORTUNAQUI</div></div><div class=\"signal\"><div style=\"color:#639922;font-size:14px;flex-shrink:0\">✓</div><div class=\"sdesc\">Identité complète de l'acheteur</div></div><div class=\"signal\"><div style=\"color:#639922;font-size:14px;flex-shrink:0\">✓</div><div class=\"sdesc\">Description : métal, titre, poids (g)</div></div><div class=\"signal\"><div style=\"color:#639922;font-size:14px;flex-shrink:0\">✓</div><div class=\"sdesc\">Prix HT + TVA (ou mention exonération)</div></div></div>"}, {"t": "AOEA Pro, 4D et suivi", "html": "<div class=\"section-title\">Clôture journalière — AOEA Pro</div><div class=\"card\"><div class=\"step-row\"><div class=\"step-num\">1</div><div class=\"step-body\"><div class=\"step-label\">Lister rachats du jour</div><div class=\"step-detail\">Trier par titre (9ct/14ct/16ct/18ct/22ct/24ct).</div></div></div><div class=\"step-row\"><div class=\"step-num\">2</div><div class=\"step-body\"><div class=\"step-label\">Créer un lot par titre sur AOEA Pro</div><div class=\"step-detail\">UN LOT = UN TITRE. Ne jamais mélanger.</div></div></div><div class=\"step-row\"><div class=\"step-num\">3</div><div class=\"step-body\"><div class=\"step-label\">Valider → N° vente AOEA Pro</div><div class=\"step-detail\">Ce numéro est la référence de toute la chaîne. Le noter.</div></div></div><div class=\"step-row\"><div class=\"step-num\">4</div><div class=\"step-body\"><div class=\"step-label\">Clore la session</div><div class=\"step-detail\">Vérifier que tous les lots du jour sont saisis.</div></div></div></div><div class=\"section-title\">Logiciel 4D</div><div class=\"card\"><div class=\"step-row\"><div class=\"step-num\">1</div><div class=\"step-body\"><div class=\"step-label\">4D → Vente après titrage</div><div class=\"step-detail\">Statut : ATTENTE DE LIQUIDATION (compte poids fondeur).</div></div></div><div class=\"step-row\"><div class=\"step-num\">2</div><div class=\"step-body\"><div class=\"step-label\">Éditer et archiver la facture 4D</div><div class=\"step-detail\">Noter le N° de facture 4D.</div></div></div><div class=\"step-row\"><div class=\"step-num\">3</div><div class=\"step-body\"><div class=\"step-label\">Commentaire virement OBLIGATOIRE — Art. L.112-6 CMF</div><div class=\"step-detail\">Indiquer dans le commentaire bancaire : N° vente AOEA Pro.</div></div></div><div class=\"step-row\"><div class=\"step-num\">4</div><div class=\"step-body\"><div class=\"step-label\">Mettre à jour le tableau comptable</div><div class=\"step-detail\">N° facture 4D + montant + N° AOEA Pro. Statut couleur.</div></div></div></div><div class=\"info-box\">🔵 Bleu = En attente | 🟡 Jaune = Envoyé | 🟢 Vert = Vérifié, facturé, payé</div>"}], "quiz": [{"q": "L'or d'investissement est soumis à :", "o": ["TVA 20%", "TVA 10%", "Exonération TVA — Art. 298 sexdecies A CGI", "TVA sur la marge"], "a": 2}, {"q": "Le N° AOEA Pro doit figurer dans :", "o": ["Le livre de police", "Le commentaire du virement bancaire", "La fiche KYC", "Le bon de rachat"], "a": 1}, {"q": "Dans 4D, 'Vente après titrage' place la vente en :", "o": ["Statut payé", "Attente de liquidation", "Archivage", "Annulation"], "a": 1}, {"q": "La couleur 'Envoyé' dans le tableau comptable est :", "o": ["Vert", "Rouge", "Bleu", "Jaune"], "a": 3}, {"q": "Peut-on mélanger deux titres dans un lot d'expédition ?", "o": ["Oui si poids identiques", "Non — un lot = un titre.", "Oui si fondeur d'accord", "Oui pour < 100g"], "a": 1}, {"q": "Si le fondeur conteste le poids :", "o": ["Accepter sans discussion", "Demander rapport d'analyse + comparer photo lot scellé", "Rembourser immédiatement", "Ignorer"], "a": 1}, {"q": "L'assurance d'expédition est basée sur :", "o": ["Prix de rachat boutique", "Cours spot × poids pur", "Valeur forfaitaire", "Prix catalogue"], "a": 1}, {"q": "Statut 'Vert' = :", "o": ["Lot préparé non envoyé", "Lot envoyé au fondeur", "Vérifié, facturé, payé", "En litige"], "a": 2}]}, {"id": "m4", "code": "M4", "title": "Comptes Poids", "dur": "2h30", "level": "Confirmé", "sections": [{"t": "Fonctionnement et ouverture", "html": "<div class=\"card\"><div class=\"step-label\">Qu'est-ce qu'un compte poids ?</div><div class=\"step-detail\" style=\"margin-top:5px;line-height:1.7\">Compte de dépôt de métal précieux physique. Le client dépose de l'or — nous créditons le poids de métal pur. Il peut acheter, vendre, arbitrer ou demander une livraison physique.</div></div><div class=\"alert-box\">🔴 Compte poids = Stockage pour compte de tiers → obligations LCB-FT dès l'ouverture.</div><div class=\"card\"><div class=\"step-row\"><div class=\"step-num\">1</div><div class=\"step-body\"><div class=\"step-label\">CGV signées</div><div class=\"step-detail\">Avant toute ouverture — sans CGV signées, pas de compte.</div></div></div><div class=\"step-row\"><div class=\"step-num\">2</div><div class=\"step-body\"><div class=\"step-label\">KYC complet</div><div class=\"step-detail\">Fiche KYC + pièce ID + bénéficiaire effectif (PM). AVANT tout mouvement.</div></div></div><div class=\"step-row\"><div class=\"step-num\">3</div><div class=\"step-body\"><div class=\"step-label\">Contrat de dépôt signé</div><div class=\"step-detail\">Frais, stockage, responsabilité, durée, conditions de clôture.</div></div></div><div class=\"step-row\"><div class=\"step-num\">4</div><div class=\"step-body\"><div class=\"step-label\">Pesée contradictoire</div><div class=\"step-detail\">Devant le client — poids noté sur le contrat.</div></div></div><div class=\"step-row\"><div class=\"step-num\">5</div><div class=\"step-body\"><div class=\"step-label\">Fiche compte créée</div><div class=\"step-detail\">N° unique, métal, poids initial, valorisation au cours LBMA du jour.</div></div></div><div class=\"step-row\"><div class=\"step-num\">6</div><div class=\"step-body\"><div class=\"step-label\">Relevé initial signé</div><div class=\"step-detail\">2 exemplaires — valeur contractuelle.</div></div></div></div>"}, {"t": "Gestion et valorisation", "html": "<table class=\"tbl\"><thead><tr><th>Opération</th><th>Client</th><th>Boutique</th></tr></thead><tbody><tr><td class=\"c-green\">Crédit</td><td>Apporte métal OU achète</td><td>Peser, analyser, créditer poids pur</td></tr><tr><td class=\"c-red\">Débit</td><td>Vend tout ou partie</td><td>Calculer contre-valeur, virer les fonds</td></tr><tr><td class=\"c-amber\">Arbitrage</td><td>Convertit or ↔ argent</td><td>Vente métal A + crédit métal B au cours du jour</td></tr><tr><td>Retrait physique</td><td>Veut récupérer son métal</td><td>Préparer lingots équivalents, peser, remettre contre reçu</td></tr></tbody></table><div class=\"card\" style=\"background:#fffbf0;border-color:#e8c96a;margin-top:14px\"><strong>Valorisation quotidienne :</strong><br>Solde (g) × Cours LBMA fixing du jour (€/g) = Valeur du compte<br><em>Exemple : 50g × 85 €/g = 4 250 €</em></div>"}, {"t": "Clôture et LCB-FT", "html": "<div class=\"card\"><div class=\"step-row\"><div class=\"step-num\">1</div><div class=\"step-body\"><div class=\"step-detail\">Demande écrite du client. Vérifier identité et signature.</div></div></div><div class=\"step-row\"><div class=\"step-num\">2</div><div class=\"step-body\"><div class=\"step-detail\">Calculer le solde final au cours LBMA du jour de clôture.</div></div></div><div class=\"step-row\"><div class=\"step-num\">3</div><div class=\"step-body\"><div class=\"step-detail\">Client choisit : (a) livraison physique ou (b) vente + virement.</div></div></div><div class=\"step-row\"><div class=\"step-num\">4</div><div class=\"step-body\"><div class=\"step-detail\">Livraison ou virement dans un délai maximum de 5 jours ouvrés.</div></div></div><div class=\"step-row\"><div class=\"step-num\">5</div><div class=\"step-body\"><div class=\"step-detail\">Relevé de clôture + reçu de solde nul signé des deux parties.</div></div></div><div class=\"step-row\"><div class=\"step-num\">6</div><div class=\"step-body\"><div class=\"step-detail\">Archiver le dossier complet 5 ans minimum.</div></div></div></div><div class=\"alert-box\">⚠️ Délai clôture maximum : <strong>5 jours ouvrés</strong> après demande écrite.</div>"}], "quiz": [{"q": "Un compte poids déclenche les obligations LCB-FT :", "o": ["Seulement > 10 000 €", "Dès l'ouverture, quel que soit le montant", "Uniquement pour les PM", "Jamais"], "a": 1}, {"q": "La formule de valorisation quotidienne est :", "o": ["Solde (g) × cours ECB veille", "Solde (g) × cours LBMA fixing du jour", "Solde (kg) × cours ouverture mois", "Valeur ouverture × taux d'intérêt"], "a": 1}, {"q": "Le délai maximum pour clôturer un compte poids est :", "o": ["2 jours ouvrés", "5 jours ouvrés", "10 jours ouvrés", "30 jours calendaires"], "a": 1}, {"q": "Peut-on ouvrir un compte poids sans contrat signé ?", "o": ["Oui si montant faible", "Oui pour clients réguliers", "Non — contrat obligatoire avant tout mouvement", "Oui en attendant de signer"], "a": 2}, {"q": "Un arbitrage consiste à :", "o": ["Fermer et rouvrir un compte", "Convertir or en argent (ou inverse) au cours du jour", "Vendre tout le solde", "Ajouter une devise étrangère"], "a": 1}, {"q": "La mise à jour KYC doit être effectuée :", "o": ["Tous les 5 ans", "À chaque opération", "Annuellement", "Jamais si pas de changement"], "a": 2}, {"q": "Le relevé mensuel doit être :", "o": ["Envoyé au client et archivé 5 ans", "Conservé en boutique uniquement", "Transmis à l'ACPR chaque mois", "Signé par le client à réception"], "a": 0}, {"q": "En cas de soupçon sur un compte poids :", "o": ["Clôturer le compte immédiatement", "Informer le client", "Note RC + Tracfin — ne jamais informer le client", "Bloquer sans consigner"], "a": 2}]}, {"id": "m5", "code": "MOG", "title": "Masters of Gold", "dur": "4h", "level": "Expert · Orion Academy", "sections": [{"t": "Les Maîtres de l'Or — Introduction", "html": "<div style=\"background:linear-gradient(135deg,#1B2A4A,#2d4272);border-radius:10px;padding:22px 26px;margin-bottom:18px;color:#fff\"><div style=\"font-size:11px;color:#C8A84B;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px\">Orion Academy · Module Expert</div><div style=\"font-size:22px;font-weight:700;margin-bottom:6px\">Les Maîtres de l'Or</div><div style=\"font-size:13px;color:#8fa3c0;line-height:1.7\">8 portraits · 24 questions · Niveau Expert<br>Portraits approfondis des grandes figures qui ont façonné la pensée mondiale sur les métaux précieux.</div></div><div class=\"info-box\"><strong>Pourquoi étudier ces figures ?</strong> Comprendre l'or, c'est comprendre ceux qui ont tenté de le maîtriser. Chaque portrait est une leçon de marché applicable dans votre conseil client.</div><div class=\"section-title\">Les 8 Maîtres</div><div class=\"card\"><div class=\"step-row\"><div class=\"step-num\" style=\"font-size:16px;background:transparent\">🏦</div><div class=\"step-body\"><div class=\"step-label\">Nathan Mayer Rothschild (1777–1836)</div><div class=\"step-detail\">Le banquier de Waterloo — premier fixeur de l'or à Londres</div></div></div><div class=\"step-row\"><div class=\"step-num\" style=\"font-size:16px;background:transparent\">🪙</div><div class=\"step-body\"><div class=\"step-label\">J.P. Morgan (1837–1913)</div><div class=\"step-detail\">\"L'or est de l'argent. Tout le reste est du crédit.\"</div></div></div><div class=\"step-row\"><div class=\"step-num\" style=\"font-size:16px;background:transparent\">📈</div><div class=\"step-body\"><div class=\"step-label\">Bernard Baruch (1870–1965)</div><div class=\"step-detail\">Le spéculateur philosophe — vendeur avant les krachs</div></div></div><div class=\"step-row\"><div class=\"step-num\" style=\"font-size:16px;background:transparent\">🌍</div><div class=\"step-body\"><div class=\"step-label\">John Maynard Keynes (1883–1946)</div><div class=\"step-detail\">La relique barbare — et pourtant investisseur en or</div></div></div><div class=\"step-row\"><div class=\"step-num\" style=\"font-size:16px;background:transparent\">🦅</div><div class=\"step-body\"><div class=\"step-label\">Alan Greenspan (1926–)</div><div class=\"step-detail\">Du gold standard défenseur au banquier central</div></div></div><div class=\"step-row\"><div class=\"step-num\" style=\"font-size:16px;background:transparent\">💛</div><div class=\"step-body\"><div class=\"step-label\">Jim Sinclair (1940–2020)</div><div class=\"step-detail\">Mr Gold — trader légendaire, liquidation au sommet exact de 1980</div></div></div><div class=\"step-row\"><div class=\"step-num\" style=\"font-size:16px;background:transparent\">📊</div><div class=\"step-body\"><div class=\"step-label\">Peter Schiff (1963–)</div><div class=\"step-detail\">La voix dissidente — toujours haussier sur l'or</div></div></div><div class=\"step-row\"><div class=\"step-num\" style=\"font-size:16px;background:transparent\">🧮</div><div class=\"step-body\"><div class=\"step-label\">Ray Dalio (1949–)</div><div class=\"step-detail\">Le portefeuille All-Weather et la place de l'or</div></div></div></div>"}, {"t": "Rothschild et Morgan", "html": "<div class=\"section-title\">Nathan Mayer Rothschild — Le Banquier de Waterloo</div><div class=\"card\"><div class=\"step-detail\" style=\"line-height:1.8;margin-bottom:10px\">Né à Francfort en 1777, Nathan arrive à Londres en 1798. En 1815, grâce à son réseau de messagers, il apprend la victoire de Wellington à Waterloo <strong>24 heures avant tout le monde</strong>. Il vend d'abord ses obligations — semant la panique — puis rachète tout à prix cassé.</div><div class=\"ok-box\"><strong>Leçon :</strong> L'information est plus précieuse que l'or. Rester calme quand les autres paniquent est la fondation du succès en métaux précieux.</div></div><div class=\"section-title\" style=\"margin-top:18px\">J.P. Morgan — L'or est de l'argent</div><div class=\"card\"><div style=\"background:#fffbf0;border-left:4px solid #C8A84B;padding:12px 16px;border-radius:0 8px 8px 0;font-size:14px;font-style:italic;color:#5a4010;margin-bottom:12px\">« L'or est de l'argent. Tout le reste est du crédit. »<br><span style=\"font-size:11px;font-style:normal;color:#aaa\">— J.P. Morgan, devant le Congrès américain, 1912</span></div><div class=\"ok-box\"><strong>Face à un client hésitant entre or physique et ETF :</strong> « L'ETF est du crédit. L'or physique est la seule chose qui ne peut pas faire défaut. »</div></div>"}, {"t": "Baruch, Keynes, Greenspan et Sinclair", "html": "<div class=\"section-title\">Bernard Baruch</div><div class=\"card\"><div style=\"background:#fffbf0;border-left:4px solid #C8A84B;padding:10px 14px;border-radius:0 8px 8px 0;font-size:13px;font-style:italic;color:#5a4010;margin-bottom:10px\">« Je n'ai jamais acheté au plus bas ni vendu au plus haut. Seulement ceux qui mentent y parviennent. »</div><div class=\"ok-box\">Vendre avant le sommet est sage. Vendre en panique est catastrophique.</div></div><div class=\"section-title\" style=\"margin-top:16px\">Keynes — La Relique Barbare (mal comprise)</div><div class=\"card\"><div style=\"background:#fff5f5;border-left:4px solid #e24b4a;padding:10px 14px;border-radius:0 8px 8px 0;font-size:13px;font-style:italic;color:#7a1a1a;margin-bottom:10px\">« L'étalon-or est une relique barbare. » — 1923</div><div class=\"step-detail\">Keynes critiquait le SYSTÈME monétaire rigide — pas l'or comme actif personnel. Il investissait lui-même en or pour son compte et pour King's College Cambridge.</div></div><div class=\"section-title\" style=\"margin-top:16px\">Greenspan et Sinclair</div><div class=\"card\"><div class=\"step-detail\" style=\"margin-bottom:10px\"><strong>Greenspan (2014) :</strong> « L'or est une monnaie. C'est la seule monnaie qui n'a pas de passif. » — Un retour à sa conviction de 1966.</div><div class=\"step-detail\"><strong>Sinclair :</strong> Il achète massivement l'or entre 1974-1979 et liquide à <strong>887,50 $/oz le 21 janvier 1980</strong> — le jour exact du sommet historique.<br>« L'or n'est pas un investissement. C'est une assurance contre l'irresponsabilité des gouvernements. »</div></div>"}, {"t": "Schiff et Dalio", "html": "<div class=\"section-title\">Peter Schiff — La Voix Dissidente</div><div class=\"card\"><div style=\"background:#fffbf0;border-left:4px solid #C8A84B;padding:10px 14px;border-radius:0 8px 8px 0;font-size:13px;font-style:italic;color:#5a4010;margin-bottom:10px\">« L'or ne monte pas. C'est le dollar qui baisse. »</div><div class=\"ok-box\">Face à un client qui dit que l'or est trop cher : « En euros constants de 1971, l'or est le même. C'est votre pouvoir d'achat qui a changé. »</div></div><div class=\"section-title\" style=\"margin-top:18px\">Ray Dalio — Le Portefeuille All-Weather</div><div class=\"card\"><div style=\"background:#fffbf0;border-left:4px solid #C8A84B;padding:10px 14px;border-radius:0 8px 8px 0;font-size:13px;font-style:italic;color:#5a4010;margin-bottom:12px\">« Si vous n'avez pas 10% de votre patrimoine en or, vous ne connaissez ni l'histoire ni l'économie. » — Ray Dalio, 2019</div><table class=\"tbl\"><thead><tr><th>Configuration économique</th><th>Or</th><th>Actions</th><th>Obligations</th></tr></thead><tbody><tr><td>Croissance + Inflation basse</td><td>Neutre</td><td class=\"c-green\">Hausse</td><td class=\"c-green\">Hausse</td></tr><tr><td>Croissance + Inflation haute</td><td class=\"c-green\">Hausse</td><td>Neutre</td><td class=\"c-red\">Baisse</td></tr><tr><td>Récession + Inflation basse</td><td>Neutre</td><td class=\"c-red\">Baisse</td><td class=\"c-green\">Hausse</td></tr><tr><td>Stagflation</td><td class=\"c-green\"><strong>Forte hausse</strong></td><td class=\"c-red\">Forte baisse</td><td class=\"c-red\">Baisse</td></tr></tbody></table></div>"}, {"t": "Synthèse — Leçons pour le conseil client", "html": "<div class=\"section-title\">Arguments clés par situation</div><div class=\"card\"><div class=\"step-row\"><div class=\"step-num\">1</div><div class=\"step-body\"><div class=\"step-label\">Client hésite entre or physique et ETF</div><div class=\"step-detail\">Morgan : « L'ETF est du crédit. L'or physique ne peut pas faire défaut. »</div></div></div><div class=\"step-row\"><div class=\"step-num\">2</div><div class=\"step-body\"><div class=\"step-label\">Client dit que l'or est trop cher</div><div class=\"step-detail\">Schiff : « En euros constants, l'or est le même. C'est votre pouvoir d'achat qui a changé. »</div></div></div><div class=\"step-row\"><div class=\"step-num\">3</div><div class=\"step-body\"><div class=\"step-label\">Client veut vendre car le cours monte</div><div class=\"step-detail\">Baruch : « Vendre avant le sommet est sage. Vendre en panique est catastrophique. »</div></div></div><div class=\"step-row\"><div class=\"step-num\">4</div><div class=\"step-body\"><div class=\"step-label\">Client sceptique sur l'or</div><div class=\"step-detail\">Greenspan : même les présidents de la Fed finissent par reconnaître que l'or est la seule monnaie sans passif.</div></div></div><div class=\"step-row\"><div class=\"step-num\">5</div><div class=\"step-body\"><div class=\"step-label\">Client demande pourquoi diversifier en or</div><div class=\"step-detail\">Dalio : en stagflation (notre contexte depuis 2021), l'or est l'actif qui performe le mieux.</div></div></div></div>"}], "quiz": [{"q": "Rothschild apprend Waterloo 24h avant les marchés. Que fait-il EN PREMIER ?", "o": ["Il achète massivement des obligations", "Il vend pour créer la panique puis rachète à prix cassé", "Il annonce la nouvelle", "Il reste neutre"], "a": 1}, {"q": "« L'or est de l'argent. Tout le reste est du crédit. » — Qui a dit cela ?", "o": ["Alan Greenspan", "Nathan Rothschild", "J.P. Morgan", "Jim Sinclair"], "a": 2}, {"q": "Keynes a dit « l'étalon-or est une relique barbare ». Qu'est-ce que cela signifie ?", "o": ["L'or n'a aucune valeur", "Il critiquait le système monétaire rigide — pas l'or comme actif personnel", "Il recommandait de ne jamais acheter d'or", "Il prédisait la fin de l'or"], "a": 1}, {"q": "La philosophie de Baruch sur la vente est :", "o": ["Vendre au sommet exact", "Vendre avant le sommet — seuls ceux qui mentent achètent au plus bas", "Vendre en panique", "Ne jamais vendre"], "a": 1}, {"q": "Jim Sinclair a liquidé sa position le 21 janvier 1980. C'était :", "o": ["Une erreur", "Le jour exact du sommet historique", "Trop tôt", "Un hasard"], "a": 1}, {"q": "En 2014, Greenspan déclare que l'or est « la seule monnaie sans passif ». C'est :", "o": ["Une contradiction totale", "Un retour à sa conviction de 1966", "Une erreur de communication", "Politique"], "a": 1}, {"q": "Face à un client qui dit que l'or est trop cher (argument Schiff) :", "o": ["Lui conseiller d'attendre", "Dire que le cours va monter", "En euros constants, c'est le pouvoir d'achat qui a changé", "Lui vendre quand même"], "a": 2}, {"q": "Dans quelle configuration l'or performe le mieux selon Dalio ?", "o": ["Croissance forte + inflation basse", "Récession + inflation basse", "Stagflation (récession + inflation haute)", "Croissance + inflation haute uniquement"], "a": 2}, {"q": "Dalio alloue quel % à l'or dans son All-Weather ?", "o": ["2,5%", "5%", "7,5%", "15%"], "a": 2}, {"q": "Qui a prédit publiquement la crise des subprimes de 2008, moqué à l'époque ?", "o": ["Ray Dalio", "Jim Sinclair", "Peter Schiff", "Bernard Baruch"], "a": 2}, {"q": "Point commun de toutes ces figures ?", "o": ["Toujours favorables à l'or", "Tous ont reconnu que l'or physique est une réserve de valeur irremplaçable", "Tous ont perdu sur l'or", "Tous ont conseillé de ne jamais vendre"], "a": 1}, {"q": "Meilleur argument face à un client hésitant entre or physique et ETF ?", "o": ["L'ETF est moins cher", "L'or physique est plus facile à revendre", "L'ETF est du crédit — l'or physique ne peut pas faire défaut", "Les ETF sont plus sûrs"], "a": 2}]}, {"id": "m6", "code": "RB", "title": "Responsable Boutique", "dur": "3h", "level": "Manager · Accès restreint", "sections": [{"t": "Ouverture et fermeture", "html": "<div class=\"section-title\">Procédure d'ouverture</div><div class=\"card\"><div class=\"step-row\"><div class=\"step-num\">1</div><div class=\"step-body\"><div class=\"step-label\">Désactivation alarme</div><div class=\"step-detail\">Dans l'ordre exact du protocole sécurité. Anomalie → ne pas entrer, appeler sécurité.</div></div></div><div class=\"step-row\"><div class=\"step-num\">2</div><div class=\"step-body\"><div class=\"step-label\">Inspection visuelle</div><div class=\"step-detail\">Tour complet : vitrines, coffre, pas de trace d'intrusion. Anomalie → police + RC.</div></div></div><div class=\"step-row\"><div class=\"step-num\">3</div><div class=\"step-body\"><div class=\"step-label\">Ouverture du coffre</div><div class=\"step-detail\">Inventaire visuel rapide. Comparer avec le registre de la veille.</div></div></div><div class=\"step-row\"><div class=\"step-num\">4</div><div class=\"step-body\"><div class=\"step-label\">Mise en vitrine</div><div class=\"step-detail\">Selon le plan de vitrine. Noter tout écart dans le registre d'ouverture.</div></div></div><div class=\"step-row\"><div class=\"step-num\">5</div><div class=\"step-body\"><div class=\"step-label\">Allumage systèmes</div><div class=\"step-detail\">Caméras, alarme mode journée, 4D ouvert, balance calibrée.</div></div></div><div class=\"step-row\"><div class=\"step-num\">6</div><div class=\"step-body\"><div class=\"step-label\">Caisse d'ouverture</div><div class=\"step-detail\">Compter et enregistrer le fond de caisse dans 4D.</div></div></div><div class=\"step-row\"><div class=\"step-num\">7</div><div class=\"step-body\"><div class=\"step-label\">Registre d'ouverture signé</div><div class=\"step-detail\">Signer avec l'heure exacte. Document opposable.</div></div></div></div><div class=\"section-title\" style=\"margin-top:18px\">Procédure de fermeture</div><div class=\"card\"><div class=\"step-row\"><div class=\"step-num\">1</div><div class=\"step-body\"><div class=\"step-label\">Arrêt des ventes</div><div class=\"step-detail\">Clôturer la dernière transaction 15 min avant fermeture.</div></div></div><div class=\"step-row\"><div class=\"step-num\">2</div><div class=\"step-body\"><div class=\"step-label\">Clôture caisse</div><div class=\"step-detail\">Compter toutes coupures/pièces. Comparer avec total 4D. Écart > 1 € → documenter.</div></div></div><div class=\"step-row\"><div class=\"step-num\">3</div><div class=\"step-body\"><div class=\"step-label\">Rapport journalier 4D</div><div class=\"step-detail\">Imprimer/enregistrer le rapport de clôture journalière.</div></div></div><div class=\"step-row\"><div class=\"step-num\">4</div><div class=\"step-body\"><div class=\"step-label\">Remise en coffre</div><div class=\"step-detail\">Ranger tous les articles selon le plan de rangement.</div></div></div><div class=\"step-row\"><div class=\"step-num\">5</div><div class=\"step-body\"><div class=\"step-label\">Rapport KYC journalier</div><div class=\"step-detail\">Créer et transmettre au RC.</div></div></div><div class=\"step-row\"><div class=\"step-num\">6</div><div class=\"step-body\"><div class=\"step-label\">Activation alarme</div><div class=\"step-detail\">Dans l'ordre exact. Fermer à clé. Signer le registre de fermeture.</div></div></div></div><div class=\"alert-box\">🔴 SÉCURITÉ : En cas d'agression — NE PAS résister. Priorité : intégrité physique du personnel.</div>"}, {"t": "Gestion de caisse journalière", "html": "<div class=\"info-box\"><strong>La gestion de caisse est une obligation comptable et réglementaire.</strong> Rigueur absolue requise.</div><div class=\"section-title\">Saisie des devises sur 4D</div><div class=\"card\"><div class=\"step-row\"><div class=\"step-num\">1</div><div class=\"step-body\"><div class=\"step-label\">Comptage physique par devise</div><div class=\"step-detail\">Compter séparément chaque devise. Grouper par coupures.</div></div></div><div class=\"step-row\"><div class=\"step-num\">2</div><div class=\"step-body\"><div class=\"step-label\">Saisie 4D — Devises</div><div class=\"step-detail\">Module Caisse → Devises. Saisir le nombre de billets par coupure. 4D calcule le total en euros.</div></div></div><div class=\"step-row\"><div class=\"step-num\">3</div><div class=\"step-body\"><div class=\"step-label\">Saisie euros au détail</div><div class=\"step-detail\">Module Caisse → Euros. Saisir coupure par coupure : 500€/200€/100€/50€/20€/10€/5€ et pièces.</div></div></div><div class=\"step-row\"><div class=\"step-num\">4</div><div class=\"step-body\"><div class=\"step-label\">Validation et impression</div><div class=\"step-detail\">Valider, imprimer le ticket de caisse. Comparer avec comptage physique.</div></div></div><div class=\"step-row\"><div class=\"step-num\">5</div><div class=\"step-body\"><div class=\"step-label\">Archivage</div><div class=\"step-detail\">Joindre le ticket au dossier journalier. Conserver 10 ans.</div></div></div></div><div class=\"section-title\" style=\"margin-top:16px\">Traitement des écarts</div><table class=\"tbl\"><thead><tr><th>Écart</th><th>Action</th></tr></thead><tbody><tr><td class=\"c-green\">< 1 €</td><td>Note dans le registre, pas de fiche d'anomalie</td></tr><tr><td class=\"c-amber\">1–10 €</td><td>Fiche d'anomalie + recherche de cause</td></tr><tr><td class=\"c-orange\">10–50 €</td><td>Fiche + validation RC + recomptage intégral</td></tr><tr><td class=\"c-red\">> 50 €</td><td>Alerte RC immédiate + rapport circonstancié</td></tr></tbody></table>"}, {"t": "Contrôle de stocks hebdomadaire", "html": "<div class=\"alert-box\">🔴 Chaque contrôle doit être signé par le Responsable Boutique ET validé par le Responsable Conformité.</div><div class=\"card\"><div class=\"step-row\"><div class=\"step-num\">1</div><div class=\"step-body\"><div class=\"step-label\">Imprimer l'inventaire 4D</div><div class=\"step-detail\">4D → Rapports → Inventaire. Imprimer toutes les références en stock à la date du contrôle.</div></div></div><div class=\"step-row\"><div class=\"step-num\">2</div><div class=\"step-body\"><div class=\"step-label\">Comptage physique méthodique</div><div class=\"step-detail\">Compter chaque référence : lingots (par poids), pièces (par type), bijoux (par référence), devises.</div></div></div><div class=\"step-row\"><div class=\"step-num\">3</div><div class=\"step-body\"><div class=\"step-label\">Cochage et scanner</div><div class=\"step-detail\">Cocher chaque ligne de l'inventaire 4D. Scanner le QR code si disponible.</div></div></div><div class=\"step-row\"><div class=\"step-num\">4</div><div class=\"step-body\"><div class=\"step-label\">Rapport d'inventaire daté</div><div class=\"step-detail\">Compiler les résultats. Dater et signer (Responsable Boutique).</div></div></div><div class=\"step-row\"><div class=\"step-num\">5</div><div class=\"step-body\"><div class=\"step-label\">Validation RC</div><div class=\"step-detail\">Transmettre au RC pour validation et signature dans les 48h.</div></div></div><div class=\"step-row\"><div class=\"step-num\">6</div><div class=\"step-body\"><div class=\"step-label\">Archivage</div><div class=\"step-detail\">Archiver le rapport signé. Conservation : 5 ans.</div></div></div></div>"}, {"t": "Conformité et saisie comptable", "html": "<div class=\"section-title\">Rapport KYC journalier</div><div class=\"card\"><div class=\"step-row\"><div class=\"step-num\">1</div><div class=\"step-body\"><div class=\"step-label\">Extraire les opérations du jour</div><div class=\"step-detail\">Lister toutes les opérations depuis 4D ou le registre manuel.</div></div></div><div class=\"step-row\"><div class=\"step-num\">2</div><div class=\"step-body\"><div class=\"step-label\">Vérifier la complétude des KYC</div><div class=\"step-detail\">Pour chaque opération : fiche KYC complète ? Pièce ID présente ?</div></div></div><div class=\"step-row\"><div class=\"step-num\">3</div><div class=\"step-body\"><div class=\"step-label\">Identifier les opérations atypiques</div><div class=\"step-detail\">Montant inhabituel, client nouveau avec gros volume, comportement signalé.</div></div></div><div class=\"step-row\"><div class=\"step-num\">4</div><div class=\"step-body\"><div class=\"step-label\">Créer et transmettre au RC</div><div class=\"step-detail\">Document synthétique : date, nombre opérations, montant total, atypiques identifiées.</div></div></div></div><div class=\"section-title\" style=\"margin-top:16px\">Saisie comptable journalière</div><div class=\"card\"><div class=\"step-row\"><div class=\"step-num\">1</div><div class=\"step-body\"><div class=\"step-label\">Extraire les opérations 4D du jour</div><div class=\"step-detail\">Rapport de clôture journalière 4D → liste de toutes les factures avec numéros.</div></div></div><div class=\"step-row\"><div class=\"step-num\">2</div><div class=\"step-body\"><div class=\"step-label\">Saisir dans l'ordre chronologique</div><div class=\"step-detail\">Une ligne par opération. N° facture 4D + N° AOEA Pro si applicable.</div></div></div><div class=\"step-row\"><div class=\"step-num\">3</div><div class=\"step-body\"><div class=\"step-label\">Vérifier le solde bancaire</div><div class=\"step-detail\">Récupérer le solde du compte boutique et le saisir dans le fichier Excel.</div></div></div><div class=\"step-row\"><div class=\"step-num\">4</div><div class=\"step-body\"><div class=\"step-label\">Sauvegarder et partager</div><div class=\"step-detail\">Envoyer la version du jour au RC et à la Direction.</div></div></div></div><div class=\"ok-box\"><strong>Règle d'or :</strong> Si une opération n'a pas de numéro de facture 4D correspondant — elle n'est pas comptabilisée.</div>"}], "quiz": [{"q": "Lors de l'ouverture, vous constatez une anomalie sur la serrure. Que faites-vous ?", "o": ["Entrer et vérifier", "Ne pas entrer — appeler police et sécurité", "Appeler un serrurier", "Ouvrir avec la clé de secours"], "a": 1}, {"q": "Un écart de caisse de 35 € en clôture. Bonne procédure ?", "o": ["Note sans suite", "Fiche d'anomalie + validation RC + recomptage intégral", "Corriger dans 4D", "Attendre le lendemain"], "a": 1}, {"q": "Le contrôle de stocks hebdomadaire doit être validé par :", "o": ["Le RB seul", "Le RB ET le RC", "La Direction uniquement", "N'importe quel agent formé"], "a": 1}, {"q": "Un scellé de lingotin ouvert lors du comptage. Vous :", "o": ["Le laissez et continuez", "Notez comme anomalie sans modifier 4D, alertez le RC immédiatement", "Refermez le scellé", "Enregistrez dans 4D directement"], "a": 1}, {"q": "Le rapport KYC journalier doit être créé :", "o": ["Une fois par semaine", "Chaque fin de journée et transmis au RC", "Quand il y a des atypiques", "Une fois par mois"], "a": 1}, {"q": "Une opération atypique non validée par le RC dans les 24h doit être :", "o": ["Annulée automatiquement", "Signalée à la Direction", "Reclassée en standard", "Reportée à la semaine suivante"], "a": 1}, {"q": "Dans le fichier Excel comptable, le N° AOEA Pro est :", "o": ["Facultatif pour les petits montants", "Obligatoire sur toutes les opérations de fonte et vente professionnelle", "Seulement > 10 000 €", "Seulement pour nouveaux clients"], "a": 1}, {"q": "Si le total Excel ne correspond pas au relevé bancaire en fin de mois :", "o": ["Corriger dans Excel directement", "Escalade Direction + comptable — jamais corriger sans traçabilité", "Attendre le mois suivant", "Informer seulement le RC"], "a": 1}, {"q": "La mise à jour hebdomadaire des dossiers clients concerne :", "o": ["Uniquement les nouveaux clients", "Clients ayant opéré dans la semaine + ceux dont le KYC arrive à échéance", "Uniquement KYC incomplets", "Tous les clients sans distinction"], "a": 1}, {"q": "En cas d'agression en boutique, la priorité absolue est :", "o": ["Protéger le stock or", "L'intégrité physique du personnel — ne pas résister", "Activer l'alarme et attendre", "Fermer la caisse et le coffre"], "a": 1}]}, {"id": "m7", "code": "CAS", "title": "Cas Réels et Calculs", "dur": "2h", "level": "Confirmé", "sections": [{"t": "Rachat d'un lingot 1 kg — calcul complet", "html": "<div class=\"section-title\">Qu'est-ce que le poids de fin ?</div><div class=\"card\"><div class=\"step-detail\" style=\"line-height:1.8;margin-bottom:10px\">Un lingot n'est jamais à 999,9‰ de pureté totale. Le <strong>poids brut</strong> est ce que la balance affiche. Le <strong>poids de fin</strong> est la quantité réelle d'or pur contenu dans le lingot, calculée à partir du titre certifié.</div><div style=\"background:#fffbf0;border-left:4px solid #C8A84B;padding:12px 16px;border-radius:0 8px 8px 0;font-size:15px;font-weight:700;color:#5a4010;margin-bottom:10px\">Formule : Poids de fin = Poids brut (g) × Titre (‰ / 1000)</div><div class=\"step-detail\">Exemple : Lingot 1 000,3g · Titre 999,5‰ → 1 000,3 × 0,9995 = <strong>999,8g d'or pur</strong></div></div><div class=\"section-title\" style=\"margin-top:18px\">Procédure de rachat lingot 1 kg</div><div class=\"card\"><div class=\"step-row\"><div class=\"step-num\">1</div><div class=\"step-body\"><div class=\"step-label\">Réception et inspection</div><div class=\"step-detail\">N° de série correspond au certificat. Poinçon lisible. Sceau intact.</div></div></div><div class=\"step-row\"><div class=\"step-num\">2</div><div class=\"step-body\"><div class=\"step-label\">Pesée officielle</div><div class=\"step-detail\">Balance certifiée. Annoncer le poids au client.</div></div></div><div class=\"step-row\"><div class=\"step-num\">3</div><div class=\"step-body\"><div class=\"step-label\">Vérification du titre</div><div class=\"step-detail\">Lire sur le certificat d'assay. Si pas de certificat : XRF obligatoire.</div></div></div><div class=\"step-row\"><div class=\"step-num\">4</div><div class=\"step-body\"><div class=\"step-label\">Calcul du poids de fin</div><div class=\"step-detail\">Ex : 1 000,35 × (999,9/1000) = 1 000,35 × 0,9999 = 1 000,25g d'or pur</div></div></div><div class=\"step-row\"><div class=\"step-num\">5</div><div class=\"step-body\"><div class=\"step-label\">Saisie dans 4D</div><div class=\"step-detail\">Saisir le poids BRUT dans 4D. Le logiciel recalcule automatiquement le poids de fin selon le titre saisi.</div></div></div><div class=\"step-row\"><div class=\"step-num\">6</div><div class=\"step-body\"><div class=\"step-label\">Calcul du prix</div><div class=\"step-detail\">Prix = Poids fin × Cours spot × (1 − Marge). Ex : 1 000,25 × 85 × 0,97 = 82 420 €</div></div></div><div class=\"step-row\"><div class=\"step-num\">7</div><div class=\"step-body\"><div class=\"step-label\">Documents obligatoires</div><div class=\"step-detail\">Pièce ID + copie · Bon de rachat · Formulaire rétractation · Livre de police · KYC</div></div></div><div class=\"step-row\"><div class=\"step-num\">8</div><div class=\"step-body\"><div class=\"step-label\">Paiement</div><div class=\"step-detail\">Virement bancaire OBLIGATOIRE — Art. L.112-6 CMF. Espèces INTERDITES sur les métaux précieux.</div></div></div></div><div class=\"section-title\" style=\"margin-top:18px\">Calculateur — Poids de fin et prix de rachat</div><div class=\"card\" style=\"background:#fffbf0;border:1.5px solid #C8A84B\"><div style=\"display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px\"><div><div style=\"font-size:11px;font-weight:700;color:#5a4010;text-transform:uppercase;margin-bottom:5px\">Poids brut (g)</div><input type=\"number\" id=\"calc-brut\" value=\"1000.35\" step=\"0.01\" oninput=\"calcLingot()\" style=\"width:100%;padding:9px 12px;border:1.5px solid #e8c96a;border-radius:7px;font-size:15px;font-weight:700;background:#fff;outline:none\"></div><div><div style=\"font-size:11px;font-weight:700;color:#5a4010;text-transform:uppercase;margin-bottom:5px\">Titre (‰)</div><input type=\"number\" id=\"calc-titre\" value=\"999.9\" step=\"0.1\" oninput=\"calcLingot()\" style=\"width:100%;padding:9px 12px;border:1.5px solid #e8c96a;border-radius:7px;font-size:15px;font-weight:700;background:#fff;outline:none\"></div><div><div style=\"font-size:11px;font-weight:700;color:#5a4010;text-transform:uppercase;margin-bottom:5px\">Cours spot (€/g)</div><input type=\"number\" id=\"calc-cours\" value=\"85.00\" step=\"0.01\" oninput=\"calcLingot()\" style=\"width:100%;padding:9px 12px;border:1.5px solid #e8c96a;border-radius:7px;font-size:15px;font-weight:700;background:#fff;outline:none\"></div><div><div style=\"font-size:11px;font-weight:700;color:#5a4010;text-transform:uppercase;margin-bottom:5px\">Marge boutique (%)</div><input type=\"number\" id=\"calc-marge\" value=\"3\" step=\"0.5\" oninput=\"calcLingot()\" style=\"width:100%;padding:9px 12px;border:1.5px solid #e8c96a;border-radius:7px;font-size:15px;font-weight:700;background:#fff;outline:none\"></div></div><div style=\"background:#1B2A4A;border-radius:8px;padding:14px 16px;color:#fff\"><div style=\"display:grid;grid-template-columns:1fr 1fr;gap:10px\"><div><div style=\"font-size:11px;color:#8fa3c0;margin-bottom:3px\">Poids de fin</div><div id=\"res-poids\" style=\"font-size:20px;font-weight:700;color:#C8A84B\">—</div></div><div><div style=\"font-size:11px;color:#8fa3c0;margin-bottom:3px\">Valeur théorique</div><div id=\"res-valeur\" style=\"font-size:20px;font-weight:700;color:#C8A84B\">—</div></div><div><div style=\"font-size:11px;color:#8fa3c0;margin-bottom:3px\">Prix de rachat proposé</div><div id=\"res-prix\" style=\"font-size:22px;font-weight:700;color:#fff\">—</div></div><div><div style=\"font-size:11px;color:#8fa3c0;margin-bottom:3px\">Marge boutique (€)</div><div id=\"res-marge\" style=\"font-size:20px;font-weight:700;color:#8fa3c0\">—</div></div></div></div></div>"}, {"t": "TMP et TPV — Calcul des taxes", "html": "<div class=\"alert-box\">🔴 Le client qui vend son or doit déclarer et payer l'impôt. Votre rôle : l'informer des deux régimes. Vous n'êtes pas son conseiller fiscal.</div><div class=\"section-title\">Les deux régimes fiscaux</div><table class=\"tbl\"><thead><tr><th>Régime</th><th>Taux</th><th>Base</th><th>Formulaire</th></tr></thead><tbody><tr><td class=\"c-red\"><strong>TMP</strong> — Taxe forfaitaire</td><td class=\"c-red\" style=\"font-weight:700\">11,5%</td><td>Prix de vente TTC</td><td>Cerfa 2091-SD</td></tr><tr><td class=\"c-green\"><strong>TPV</strong> — Plus-values réelles</td><td class=\"c-green\" style=\"font-weight:700\">36,2% sur PV nette</td><td>Prix vente − Prix achat (avec abattements)</td><td>Cerfa 2048-M-SD</td></tr></tbody></table><div class=\"info-box\" style=\"margin-top:12px\"><strong>Abattements TPV :</strong> 0% pendant 2 ans, puis 5%/an dès la 3e année → Exonération totale après 22 ans.</div><div class=\"section-title\" style=\"margin-top:16px\">Calculateur TMP vs TPV</div><div class=\"card\" style=\"background:#f8f9fb\"><div style=\"display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px\"><div><div style=\"font-size:11px;font-weight:700;color:#555;text-transform:uppercase;margin-bottom:5px\">Prix de vente (€)</div><input type=\"number\" id=\"t-vente\" value=\"85000\" oninput=\"calcTax()\" style=\"width:100%;padding:9px 12px;border:1.5px solid #dde1e7;border-radius:7px;font-size:14px;font-weight:700;background:#fff;outline:none\"></div><div><div style=\"font-size:11px;font-weight:700;color:#555;text-transform:uppercase;margin-bottom:5px\">Prix d'achat (€)</div><input type=\"number\" id=\"t-achat\" value=\"62000\" oninput=\"calcTax()\" style=\"width:100%;padding:9px 12px;border:1.5px solid #dde1e7;border-radius:7px;font-size:14px;font-weight:700;background:#fff;outline:none\"></div><div><div style=\"font-size:11px;font-weight:700;color:#555;text-transform:uppercase;margin-bottom:5px\">Années de détention</div><input type=\"number\" id=\"t-annees\" value=\"5\" min=\"0\" max=\"30\" oninput=\"calcTax()\" style=\"width:100%;padding:9px 12px;border:1.5px solid #dde1e7;border-radius:7px;font-size:14px;font-weight:700;background:#fff;outline:none\"></div></div><div style=\"display:grid;grid-template-columns:1fr 1fr;gap:12px\"><div style=\"background:#fff5f5;border:1.5px solid #e24b4a;border-radius:10px;padding:14px\"><div style=\"font-size:12px;font-weight:700;color:#a32d2d;margin-bottom:10px\">Régime TMP</div><div style=\"font-size:11px;color:#777;margin-bottom:3px\">Base : prix de vente × 11,5%</div><div id=\"tmp-base\" style=\"font-size:13px;color:#555;margin-bottom:6px\">—</div><div style=\"font-size:11px;color:#777;margin-bottom:3px\">Taxe à payer</div><div id=\"tmp-taxe\" style=\"font-size:22px;font-weight:700;color:#a32d2d\">—</div><div id=\"tmp-net\" style=\"font-size:12px;color:#777;margin-top:6px\">Net perçu : —</div></div><div style=\"background:#f0fae8;border:1.5px solid #639922;border-radius:10px;padding:14px\"><div style=\"font-size:12px;font-weight:700;color:#27500A;margin-bottom:10px\">Régime TPV</div><div style=\"font-size:11px;color:#555;margin-bottom:3px\">Abattement (<span id=\"tpv-pct\">—</span>%)</div><div id=\"tpv-pv\" style=\"font-size:13px;color:#27500A;margin-bottom:4px\">—</div><div id=\"tpv-abat\" style=\"font-size:13px;color:#27500A;margin-bottom:4px\">—</div><div style=\"font-size:11px;color:#555;margin-bottom:3px\">Taxe à payer</div><div id=\"tpv-taxe\" style=\"font-size:22px;font-weight:700;color:#27500A\">—</div><div id=\"tpv-net\" style=\"font-size:12px;color:#555;margin-top:6px\">Net perçu : —</div></div></div><div id=\"tax-conseil\" style=\"margin-top:12px;padding:10px 14px;border-radius:8px;font-size:12px;font-weight:700\"></div></div>"}, {"t": "Cas pratiques", "html": "<div class=\"section-title\">Cas 1 — Client sans justificatif d'achat</div><div class=\"card\"><div class=\"step-label\">Situation</div><div class=\"step-detail\" style=\"margin-bottom:10px\">Mme Martin vend 5 Napoléons reçus en héritage. Aucun justificatif. Prix de vente : 2 850 €.</div><div class=\"step-label\" style=\"margin-top:10px\">Solution</div><div class=\"step-detail\">Sans justificatif → seul le régime TMP est applicable.<br>TMP = 2 850 × 11,5% = <strong>327,75 €</strong> → Cerfa 2091-SD<br>Net perçu : 2 850 − 327,75 = 2 522,25 €</div></div><div class=\"section-title\" style=\"margin-top:18px\">Cas 2 — Lingot 100g acheté en 2018</div><div class=\"card\"><div class=\"step-label\">Situation</div><div class=\"step-detail\" style=\"margin-bottom:10px\">M. Dupont vend en 2026 un lingot 100g acheté en 2018 à 4 200 €. Prix de vente : 8 800 €. Facture disponible.</div><div class=\"step-label\" style=\"margin-top:10px\">Calcul TPV (8 ans)</div><div class=\"step-detail\">PV brute : 8 800 − 4 200 = 4 600 €<br>Abattement : (8−2) × 5% = 30% → −1 380 €<br>PV nette : 3 220 € → Taxe : 3 220 × 36,2% = <strong>1 165,64 €</strong></div><div class=\"step-label\" style=\"margin-top:10px\">TMP (comparaison)</div><div class=\"step-detail\">8 800 × 11,5% = <strong>1 012 €</strong> → TMP plus avantageux ici !</div><div class=\"ok-box\" style=\"margin-top:10px\">Informer le client des deux options — la décision lui appartient.</div></div><div class=\"section-title\" style=\"margin-top:18px\">Cas 3 — Lingot 1 kg détenu 25 ans</div><div class=\"card\"><div class=\"step-detail\">Client vend un lingot 1 kg acheté en 2001 à 9 500 €. Prix de vente : 85 000 €.<br>25 ans ≥ 22 ans → Abattement 100% → <strong>Exonération totale TPV</strong><br>TMP : 85 000 × 11,5% = 9 775 €</div><div class=\"alert-box\" style=\"margin-top:10px\">TPV obligatoirement plus avantageux après 22 ans. Exonération totale si facture d'achat disponible.</div></div>"}], "quiz": [{"q": "La formule du poids de fin est :", "o": ["Poids brut ÷ Titre", "Poids brut × (Titre / 1000)", "Titre × Cours spot", "Poids brut − Marge"], "a": 1}, {"q": "Dans 4D, pour le rachat d'un lingot, on saisit :", "o": ["Le poids de fin directement", "Le poids brut — 4D calcule automatiquement le poids de fin", "Le poids moyen", "Le poids certifié LBMA"], "a": 1}, {"q": "Le régime TMP est calculé sur :", "o": ["La plus-value réalisée", "Le prix de vente brut × 11,5%", "Le prix d'achat", "La différence vente/achat"], "a": 1}, {"q": "Le taux de la TMP sur les métaux précieux est :", "o": ["11,5%", "19,6%", "36,2%", "7,5%"], "a": 0}, {"q": "L'abattement TPV commence à partir de :", "o": ["La 1re année", "La 2e année", "La 3e année (5% par an ensuite)", "La 5e année"], "a": 2}, {"q": "Après combien d'années l'exonération totale en régime TPV est-elle acquise ?", "o": ["15 ans", "20 ans", "22 ans", "30 ans"], "a": 2}, {"q": "Un client vend 8 800 € un bien acheté 4 200 € il y a 8 ans. La meilleure approche est :", "o": ["TPV toujours plus avantageuse avec justificatif", "TMP toujours plus avantageuse", "Calculer les deux et choisir le plus avantageux", "Pas de taxe sur les métaux"], "a": 2}, {"q": "Le Cerfa utilisé pour déclarer la TMP est :", "o": ["Cerfa 2048-M-SD", "Cerfa 2091-SD", "Cerfa 2042", "Cerfa 3115-SD"], "a": 1}]}, {"id": "m8", "code": "FISC", "title": "Fiscalité MP et Cerfa", "dur": "2h", "level": "Confirmé", "sections": [{"t": "Cadre légal de la fiscalité MP", "html": "<div class=\"section-title\">Textes applicables</div><table class=\"tbl\"><thead><tr><th>Texte</th><th>Objet</th></tr></thead><tbody><tr><td><strong>Art. 150 VI CGI</strong></td><td>Définit la taxe forfaitaire sur les métaux précieux (TMP)</td></tr><tr><td><strong>Art. 150 VII CGI</strong></td><td>Option pour le régime des plus-values réelles (TPV)</td></tr><tr><td><strong>Art. 150 UA CGI</strong></td><td>Champ d'application — définit les métaux concernés</td></tr><tr><td><strong>Directive 98/80/CE</strong></td><td>Exonération de TVA sur l'or d'investissement</td></tr><tr><td><strong>Art. 298 sexdecies A CGI</strong></td><td>Transposition française — exonération TVA or d'investissement</td></tr><tr><td><strong>Art. L.112-6 et L.112-7 CMF</strong></td><td>Interdiction paiements espèces — Décret 6 mai 2010</td></tr></tbody></table><div class=\"section-title\" style=\"margin-top:16px\">Quels biens sont concernés ?</div><table class=\"tbl\"><thead><tr><th>Bien</th><th>Fiscalité vente</th><th>TVA achat</th></tr></thead><tbody><tr><td class=\"c-amber\"><strong>Or d'investissement</strong><br>(lingots ≥ 995‰, pièces ≥ 900‰ post-1800)</td><td>TMP 11,5% ou TPV 36,2%</td><td class=\"c-green\">Exonéré — Art. 298 sexdecies A CGI</td></tr><tr><td class=\"c-amber\"><strong>Argent d'investissement</strong></td><td>TMP 11,5% ou TPV 36,2%</td><td>TVA 20%</td></tr><tr><td><strong>Bijoux or / objets précieux</strong></td><td>TMP 6,5% ou TPV</td><td>TVA 20% (neuf) · Marge (occasion)</td></tr><tr><td><strong>Platine, palladium brut</strong></td><td>TMP 11,5% ou TPV 36,2%</td><td>TVA 20%</td></tr></tbody></table>"}, {"t": "La TMP — Cerfa 2091-SD", "html": "<div class=\"section-title\">Fonctionnement de la TMP</div><div class=\"card\"><div class=\"step-detail\" style=\"line-height:1.8;margin-bottom:12px\">La <strong>Taxe forfaitaire sur les Métaux Précieux (TMP)</strong> est prélevée sur le prix de vente brut, sans tenir compte du prix d'achat. Simple à calculer, sans justificatif requis.</div><table class=\"tbl\"><thead><tr><th>Type de bien</th><th>Taux TMP</th><th>Dont CRDS</th></tr></thead><tbody><tr><td>Or, argent, platine, palladium</td><td class=\"c-red\" style=\"font-weight:700\">11,5%</td><td>0,5%</td></tr><tr><td>Bijoux, objets d'art, collection</td><td class=\"c-amber\" style=\"font-weight:700\">6,5%</td><td>0,5%</td></tr></tbody></table></div><div class=\"section-title\" style=\"margin-top:16px\">Comment remplir le Cerfa 2091-SD</div><div class=\"card\"><div class=\"step-row\"><div class=\"step-num\" style=\"background:#639922;font-size:10px\">✓</div><div class=\"step-body\"><div class=\"step-label\">Cadre 1 — Identité du cédant</div><div class=\"step-detail\">Nom, prénom, adresse complète, date de naissance du vendeur. Copier depuis la pièce d'identité.</div></div></div><div class=\"step-row\"><div class=\"step-num\" style=\"background:#639922;font-size:10px\">✓</div><div class=\"step-body\"><div class=\"step-label\">Cadre 2 — Identité de l'acquéreur</div><div class=\"step-detail\">SAS FORTUNAQUI · GODOT ET FILS. Adresse complète. SIRET.</div></div></div><div class=\"step-row\"><div class=\"step-num\" style=\"background:#639922;font-size:10px\">✓</div><div class=\"step-body\"><div class=\"step-label\">Cadre 3 — Désignation du bien</div><div class=\"step-detail\">Description précise : « Or en lingot de 1 000g, titre 999,9‰, N° série XXXX »</div></div></div><div class=\"step-row\"><div class=\"step-num\" style=\"background:#639922;font-size:10px\">✓</div><div class=\"step-body\"><div class=\"step-label\">Cadre 4 — Prix de cession</div><div class=\"step-detail\">Montant brut payé au vendeur. Base de calcul de la TMP.</div></div></div><div class=\"step-row\"><div class=\"step-num\" style=\"background:#639922;font-size:10px\">✓</div><div class=\"step-body\"><div class=\"step-label\">Cadre 5 — Taxe due</div><div class=\"step-detail\">Prix × 11,5% (taxe) + Prix × 0,5% (CRDS) = Total à verser aux impôts.</div></div></div></div><div class=\"section-title\" style=\"margin-top:16px\">Exemple chiffré — lingot 85 000 €</div><table class=\"tbl\"><thead><tr><th>Ligne</th><th>Calcul</th><th>Montant</th></tr></thead><tbody><tr><td>Prix de cession</td><td>Montant brut</td><td class=\"c-amber\" style=\"font-weight:700\">85 000 €</td></tr><tr><td>Taxe (11,5%)</td><td>85 000 × 11,5%</td><td class=\"c-red\" style=\"font-weight:700\">9 775 €</td></tr><tr><td>CRDS (0,5%)</td><td>85 000 × 0,5%</td><td style=\"font-weight:700\">425 €</td></tr><tr><td><strong>Total aux impôts</strong></td><td>9 775 + 425</td><td class=\"c-red\" style=\"font-weight:700;font-size:15px\">10 200 €</td></tr><tr><td>Net client</td><td>85 000 − 10 200</td><td class=\"c-green\" style=\"font-weight:700\">74 800 €</td></tr></tbody></table>"}, {"t": "La TPV — Cerfa 2048-M-SD", "html": "<div class=\"section-title\">Fonctionnement de la TPV</div><div class=\"card\"><div style=\"background:#fffbf0;border-left:4px solid #C8A84B;padding:12px 16px;border-radius:0 8px 8px 0;font-size:13px;line-height:1.8\"><strong>Taux global TPV : 36,2%</strong> (19% impôt + 17,2% prélèvements sociaux)<br><strong>Abattement :</strong> 5% par année de détention à partir de la 3e année<br><strong>Exonération totale :</strong> après 22 ans de détention<br><strong>Conditions :</strong> justificatif d'achat obligatoire</div></div><div class=\"section-title\" style=\"margin-top:16px\">Comment remplir le Cerfa 2048-M-SD</div><div class=\"card\"><div class=\"step-row\"><div class=\"step-num\" style=\"background:#1B2A4A;color:#C8A84B\">→</div><div class=\"step-body\"><div class=\"step-label\">Rubrique 510 — Identification</div><div class=\"step-detail\">Identité complète du contribuable. Date et lieu de cession.</div></div></div><div class=\"step-row\"><div class=\"step-num\" style=\"background:#1B2A4A;color:#C8A84B\">→</div><div class=\"step-body\"><div class=\"step-label\">Rubrique 530 — Prix de cession</div><div class=\"step-detail\">Prix de vente brut (ce que vous avez payé au client).</div></div></div><div class=\"step-row\"><div class=\"step-num\" style=\"background:#1B2A4A;color:#C8A84B\">→</div><div class=\"step-body\"><div class=\"step-label\">Rubrique 540 — Prix d'acquisition</div><div class=\"step-detail\">Prix d'achat justifié par la facture d'origine.</div></div></div><div class=\"step-row\"><div class=\"step-num\" style=\"background:#1B2A4A;color:#C8A84B\">→</div><div class=\"step-body\"><div class=\"step-label\">Rubrique 550 — Plus-value brute</div><div class=\"step-detail\">Prix cession − Prix acquisition = PV brute.</div></div></div><div class=\"step-row\"><div class=\"step-num\" style=\"background:#1B2A4A;color:#C8A84B\">→</div><div class=\"step-body\"><div class=\"step-label\">Rubrique 560 — Abattement</div><div class=\"step-detail\">(Années − 2) × 5% × PV brute. Maximum 100% à 22 ans.</div></div></div><div class=\"step-row\"><div class=\"step-num\" style=\"background:#1B2A4A;color:#C8A84B\">→</div><div class=\"step-body\"><div class=\"step-label\">Rubrique 580 — Impôt dû</div><div class=\"step-detail\">PV nette × 19% (impôt) + PV nette × 17,2% (PS) = Total × 36,2%</div></div></div></div><div class=\"section-title\" style=\"margin-top:16px\">Abattements TPV — référence rapide</div><table class=\"tbl\"><thead><tr><th>Années de détention</th><th>Abattement</th><th>Taxe sur 10 000 € PV</th></tr></thead><tbody><tr><td>0 à 2 ans</td><td>0%</td><td>3 620 €</td></tr><tr><td>3 ans</td><td>5%</td><td>3 439 €</td></tr><tr><td>5 ans</td><td>15%</td><td>3 077 €</td></tr><tr><td>10 ans</td><td>40%</td><td>2 172 €</td></tr><tr><td>15 ans</td><td>65%</td><td>1 267 €</td></tr><tr><td>20 ans</td><td>90%</td><td>362 €</td></tr><tr><td>22 ans et +</td><td style=\"color:#27500A;font-weight:700\">100%</td><td style=\"color:#27500A;font-weight:700\">0 € (exonéré)</td></tr></tbody></table>"}, {"t": "Arbre de décision TMP vs TPV", "html": "<div class=\"section-title\">Comment choisir entre TMP et TPV ?</div><div class=\"card\"><div class=\"step-row\"><div class=\"step-num\" style=\"background:#C8A84B;color:#1B2A4A\">Q1</div><div class=\"step-body\"><div class=\"step-label\">Le client a-t-il le justificatif d'achat ?</div><div class=\"step-detail\">Non → TMP obligatoire. Oui → comparer les deux régimes.</div></div></div><div class=\"step-row\"><div class=\"step-num\" style=\"background:#C8A84B;color:#1B2A4A\">Q2</div><div class=\"step-body\"><div class=\"step-label\">La détention est-elle ≥ 22 ans ?</div><div class=\"step-detail\">Oui → TPV toujours meilleure (exonération totale). Non → continuer.</div></div></div><div class=\"step-row\"><div class=\"step-num\" style=\"background:#C8A84B;color:#1B2A4A\">Q3</div><div class=\"step-body\"><div class=\"step-label\">Calculer les deux taxes</div><div class=\"step-detail\">TMP = Prix vente × 11,5% · TPV = PV nette × 36,2%. Choisir le plus bas.</div></div></div><div class=\"step-row\"><div class=\"step-num\" style=\"background:#C8A84B;color:#1B2A4A\">Q4</div><div class=\"step-body\"><div class=\"step-label\">Informer le client</div><div class=\"step-detail\">Lui montrer les deux montants. La décision est la sienne — vous n'êtes pas conseiller fiscal.</div></div></div></div><div class=\"section-title\" style=\"margin-top:16px\">Documents à remettre au client après chaque vente</div><div class=\"card\"><div class=\"step-row\"><div class=\"step-num\" style=\"font-size:10px;background:#1B2A4A\">📄</div><div class=\"step-body\"><div class=\"step-label\">Facture de rachat</div><div class=\"step-detail\">Obligatoire. Archiver 10 ans.</div></div></div><div class=\"step-row\"><div class=\"step-num\" style=\"font-size:10px;background:#1B2A4A\">📄</div><div class=\"step-body\"><div class=\"step-label\">Cerfa 2091-SD (si TMP)</div><div class=\"step-detail\">Pré-remplir les cadres 1-2-4. Le client complète, signe et dépose aux impôts dans le mois.</div></div></div><div class=\"step-row\"><div class=\"step-num\" style=\"font-size:10px;background:#1B2A4A\">📄</div><div class=\"step-body\"><div class=\"step-label\">Cerfa 2048-M-SD (si TPV)</div><div class=\"step-detail\">Le client joint ce formulaire à sa déclaration de revenus annuelle.</div></div></div><div class=\"step-row\"><div class=\"step-num\" style=\"font-size:10px;background:#1B2A4A\">📄</div><div class=\"step-body\"><div class=\"step-label\">Votre facture d'achat</div><div class=\"step-detail\">Rappeler au client de conserver sa facture pour les futures cessions.</div></div></div></div><div class=\"alert-box\">🔴 RESPONSABILITÉ : SAS FORTUNAQUI n'est pas conseiller fiscal. Votre rôle est d'informer. Pour montants importants, recommander un comptable ou notaire.</div>"}], "quiz": [{"q": "Quel article du CGI définit la TMP ?", "o": ["Art. 150 VI", "Art. 298 sexdecies A", "Art. 150 UA", "Art. L.112-6 CMF"], "a": 0}, {"q": "La CRDS s'applique à quel taux ?", "o": ["1%", "0,5%", "2%", "Seulement si TMP"], "a": 1}, {"q": "L'or d'investissement est exonéré de TVA en vertu de :", "o": ["Art. 150 VI CGI", "Art. 298 sexdecies A CGI + Directive 98/80/CE", "Art. L.112-6 CMF", "Décret du 6 mai 2010"], "a": 1}, {"q": "Le Cerfa 2091-SD est déposé aux impôts :", "o": ["Avant la vente", "Dans l'année suivant la vente", "Dans le mois suivant la cession", "Avec la déclaration annuelle"], "a": 2}, {"q": "Le Cerfa 2048-M-SD concerne :", "o": ["Le régime TMP", "Le régime TPV — plus-values réelles", "Les deux régimes", "La TVA sur les métaux"], "a": 1}, {"q": "Un client vend des bijoux or. Le taux TMP applicable est :", "o": ["11,5%", "6,5%", "20%", "36,2%"], "a": 1}, {"q": "La TPV est toujours plus avantageuse que la TMP :", "o": ["Vrai — elle prend en compte le prix d'achat", "Faux — il faut calculer les deux et comparer", "Vrai — mais seulement après 5 ans", "Faux — la TMP est toujours plus simple"], "a": 1}, {"q": "Si un client n'a pas de justificatif d'achat :", "o": ["Refuser l'achat", "Appliquer obligatoirement la TMP", "Appliquer la TPV sans justificatif", "Déduire 40% comme coût estimé"], "a": 1}]}, {"id": "m9", "code": "GST", "title": "Gestion de Stock & Optimisation des Marges", "dur": "3h", "level": "Confirmé · Vente", "sections": [{"t": "Les produits d'or d'investissement", "html": "<div class=\"hero\" style=\"background:linear-gradient(135deg,#1B2A4A,#243a64);border-radius:10px;padding:20px 24px;margin-bottom:18px;color:#fff\"><div style=\"font-size:10px;color:#C8A84B;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:5px\">Module Gestion de Stock · Vente</div><div style=\"font-size:20px;font-weight:700;margin-bottom:4px\">Produits, Marges et Optimisation du Stock</div><div style=\"font-size:12px;color:#8fa3c0\">Or de bourse · Or moderne · Pièces hors cote · Lingots · Argent · Prime · Stratégie de vente</div></div>\n\n<div class=\"section-title\">1. Or de bourse (pièces cotées) — Référence de marché</div>\n<table class=\"tbl\"><thead><tr><th>Produit</th><th>Poids or pur</th><th>Prime typique</th><th>Liquidité</th><th>Profil acheteur</th></tr></thead><tbody>\n<tr><td class=\"c-amber\"><strong>Napoléon 20 Fr</strong></td><td>5,806g (900‰)</td><td>10–25%</td><td>Excellente — FR et Europe</td><td>Tous profils, entrée de gamme</td></tr>\n<tr><td class=\"c-amber\"><strong>Napoléon 10 Fr</strong></td><td>2,903g (900‰)</td><td>20–40%</td><td>Bonne — FR</td><td>Petit budget, cadeau</td></tr>\n<tr><td class=\"c-amber\"><strong>Vreneli 20 CHF</strong></td><td>5,806g (900‰)</td><td>10–20%</td><td>Bonne — Suisse/ESP</td><td>Clientèle transfrontalière</td></tr>\n<tr><td class=\"c-amber\"><strong>Souverain anglais</strong></td><td>7,322g (916‰)</td><td>10–20%</td><td>Bonne — Europe</td><td>Patrimoniaux</td></tr>\n<tr><td class=\"c-amber\"><strong>Krugerrand 1oz</strong></td><td>31,10g (999‰)</td><td>2–5%</td><td>Mondiale</td><td>Investisseur, faible prime</td></tr>\n<tr><td class=\"c-amber\"><strong>Maple Leaf 1oz</strong></td><td>31,10g (999,9‰)</td><td>3–6%</td><td>Mondiale</td><td>Investisseur, pureté maximale</td></tr>\n<tr><td class=\"c-amber\"><strong>Britannia 1oz</strong></td><td>31,10g (999,9‰)</td><td>3–6%</td><td>Bonne — Europe</td><td>Diversification internationale</td></tr>\n</tbody></table>\n\n<div class=\"section-title\" style=\"margin-top:18px\">2. Or d'investissement moderne (lingots et lingotins)</div>\n<table class=\"tbl\"><thead><tr><th>Format</th><th>Valeur approx. (85€/g)</th><th>Prime / g</th><th>Certificat LBMA</th><th>Usage recommandé</th></tr></thead><tbody>\n<tr><td><strong>Lingotin 1g</strong></td><td>~85 €</td><td>Très élevée (15–30%)</td><td>Non</td><td>Cadeau, initiation enfant</td></tr>\n<tr><td><strong>Lingotin 5g</strong></td><td>~425 €</td><td>Élevée (8–15%)</td><td>Selon fab.</td><td>Épargne régulière, cadeau</td></tr>\n<tr><td><strong>Lingotin 10g</strong></td><td>~850 €</td><td>Moyenne (5–10%)</td><td>Selon fab.</td><td>Bon compromis prime/poids</td></tr>\n<tr><td><strong>Lingotin 20g</strong></td><td>~1 700 €</td><td>Modérée (4–8%)</td><td>Oui (LBMA)</td><td>Investissement patrimonial</td></tr>\n<tr><td><strong>Lingotin 50g</strong></td><td>~4 250 €</td><td>Faible (3–6%)</td><td>Oui (LBMA)</td><td>Stock stratégique</td></tr>\n<tr><td><strong>Lingotin 100g</strong></td><td>~8 500 €</td><td>Très faible (2–5%)</td><td>Oui (LBMA)</td><td>Investisseur confirmé</td></tr>\n<tr><td><strong>Lingot 250g</strong></td><td>~21 250 €</td><td>Minimale (2–4%)</td><td>Oui (LBMA)</td><td>Grandes positions</td></tr>\n<tr><td><strong>Lingot 1 kg (Good Delivery)</strong></td><td>~85 000 €</td><td>Quasi nulle (&lt;2%)</td><td>Oui LBMA GD</td><td>Institutionnel, gros patrimoine</td></tr>\n</tbody></table>\n<div class=\"info-box\"><strong>Lingot neuf vs lingot français :</strong> Le lingot <em>neuf</em> (LBMA, en carte blister) a une prime légèrement supérieure car il est certifié, tracé et immédiatement acceptable partout. Le <em>lingot français</em> (ancienne fonte, sans blister) a une prime inférieure mais reste très liquide sur le marché professionnel. À l'achat client, toujours exiger le certificat d'assay.</div>\n\n<div class=\"section-title\" style=\"margin-top:18px\">3. Pièces hors cote</div>\n<div class=\"card\">\n<div class=\"step-detail\" style=\"line-height:1.8;margin-bottom:8px\">Les pièces <strong>hors cote</strong> sont des pièces numismatiques ou historiques dont la valeur dépasse la simple valeur métal. Leur prime est souvent élevée et liée à la rareté, l'état de conservation et la demande collectionneurs.</div>\n<div class=\"step-row\"><div class=\"step-num\" style=\"background:#C8A84B;color:#1B2A4A\">!</div><div class=\"step-body\"><div class=\"step-label\">Exemples typiques en boutique</div><div class=\"step-detail\">Pièces frappées avant 1800 · Millésimes rares (ex : Napoléon 1808 1er type) · Pièces en état fleur de coin (FDC) · Séries limitées · Monnaies de la Monnaie de Paris</div></div></div>\n<div class=\"step-row\"><div class=\"step-num\" style=\"background:#C8A84B;color:#1B2A4A\">!</div><div class=\"step-body\"><div class=\"step-label\">Fiscalité différente</div><div class=\"step-detail\">Les pièces hors cote (valeur &gt; 250% du cours métal) relèvent du régime des plus-values mobilières classique — pas du régime TMP/TPV métaux précieux. Vérifier systématiquement avant toute vente.</div></div></div>\n<div class=\"step-row\"><div class=\"step-num\" style=\"background:#C8A84B;color:#1B2A4A\">!</div><div class=\"step-body\"><div class=\"step-label\">Marge potentielle</div><div class=\"step-detail\">La marge sur les pièces hors cote peut être très supérieure à la marge sur l'or de bourse — mais elles nécessitent une expertise numismatique et un marché acheteur identifié. Ne pas surcharger le stock sans débouché identifié.</div></div></div>\n</div>"}, {"t": "L'argent investissement — Spécificités et primes", "html": "<div class=\"section-title\">Produits argent en stock</div>\n<table class=\"tbl\"><thead><tr><th>Produit</th><th>Poids</th><th>Prime typique</th><th>TVA</th><th>Liquidité</th></tr></thead><tbody>\n<tr><td><strong>Philharmonique 1oz (argent)</strong></td><td>31,10g (999‰)</td><td>10–20%</td><td>20% (achat)</td><td>Bonne — Europe</td></tr>\n<tr><td><strong>Maple Leaf argent 1oz</strong></td><td>31,10g (999,9‰)</td><td>10–20%</td><td>20%</td><td>Bonne — mondiale</td></tr>\n<tr><td><strong>American Eagle argent 1oz</strong></td><td>31,10g (999‰)</td><td>12–22%</td><td>20%</td><td>Bonne — mondiale</td></tr>\n<tr><td><strong>Britannia argent 1oz</strong></td><td>31,10g (999,9‰)</td><td>10–18%</td><td>20%</td><td>Bonne — Europe</td></tr>\n<tr><td><strong>Lingotin argent 100g</strong></td><td>100g (999‰)</td><td>8–15%</td><td>20%</td><td>Moyenne</td></tr>\n<tr><td><strong>Lingotin argent 1 kg</strong></td><td>1 000g (999‰)</td><td>4–10%</td><td>20%</td><td>Bonne — pro</td></tr>\n</tbody></table>\n\n<div class=\"section-title\" style=\"margin-top:18px\">Pourquoi l'argent a plus de volatilité que l'or ?</div>\n<div class=\"card\">\n<div class=\"step-row\"><div class=\"step-num\">1</div><div class=\"step-body\"><div class=\"step-label\">Marché beaucoup plus petit</div><div class=\"step-detail\">Le marché mondial de l'argent est environ 10 à 15 fois plus petit que celui de l'or. Un même volume d'achats ou de ventes a donc un impact sur le cours beaucoup plus important.</div></div></div>\n<div class=\"step-row\"><div class=\"step-num\">2</div><div class=\"step-body\"><div class=\"step-label\">Double nature : métal précieux ET industriel</div><div class=\"step-detail\">L'argent est utilisé dans les panneaux solaires, l'électronique, la médecine (antibactérien) et les batteries. Sa demande industrielle (60% de la consommation mondiale) le rend sensible aux cycles économiques — ce que l'or n'est pas.</div></div></div>\n<div class=\"step-row\"><div class=\"step-num\">3</div><div class=\"step-body\"><div class=\"step-label\">Ratio or/argent historique</div><div class=\"step-detail\">Historiquement, le ratio or/argent tourne autour de 1:15 à 1:20 (15-20 oz d'argent pour 1 oz d'or). Aujourd'hui ce ratio dépasse 1:80 — l'argent est donc statistiquement sous-évalué par rapport à l'or.</div></div></div>\n<div class=\"step-row\"><div class=\"step-num\">4</div><div class=\"step-body\"><div class=\"step-label\">Moins de liquidité en boutique</div><div class=\"step-detail\">Le marché secondaire de l'argent en boutique est moins profond que celui de l'or. Il est plus difficile de revendre rapidement de grandes quantités d'argent sans impacter le prix.</div></div></div>\n</div>\n\n<div class=\"section-title\" style=\"margin-top:18px\">Pourquoi les primes sur l'argent sont-elles plus élevées ?</div>\n<div class=\"card\">\n<div class=\"step-row\"><div class=\"step-num\">1</div><div class=\"step-body\"><div class=\"step-label\">TVA de 20% à l'achat</div><div class=\"step-detail\">Contrairement à l'or d'investissement (exonéré de TVA), l'argent est soumis à TVA 20% à l'achat. Cette TVA est intégrée dans le prix de vente au client — elle gonfle mécaniquement la prime perçue.</div></div></div>\n<div class=\"step-row\"><div class=\"step-num\">2</div><div class=\"step-body\"><div class=\"step-label\">Coût de fabrication rapporté au prix</div><div class=\"step-detail\">Frapper ou couler une pièce ou un lingotin coûte environ le même prix quelle que soit la valeur du métal. Pour l'argent (valeur ~0,85 €/g), ce coût fixe représente un % beaucoup plus élevé du prix total que pour l'or (85 €/g).</div></div></div>\n<div class=\"step-row\"><div class=\"step-num\">3</div><div class=\"step-body\"><div class=\"step-label\">Logistique plus complexe</div><div class=\"step-detail\">L'argent est lourd pour sa valeur — 1 kg d'argent vaut ~850 €, contre ~85 000 € pour 1 kg d'or. Transport, stockage et manutention coûtent proportionnellement beaucoup plus cher.</div></div></div>\n</div>\n<div class=\"alert-box\">Conseil stock argent : ne pas surcharger. L'argent immobilise du capital et de l'espace pour une valeur relativement faible. Maintenir un stock raisonnable de pièces 1oz (les plus demandées) et éviter les grands lingots à moins d'avoir un acheteur identifié.</div>"}, {"t": "La notion de prime — Comprendre et expliquer", "html": "<div class=\"section-title\">Définition et calcul</div>\n<div class=\"card\" style=\"background:#fffbf0;border:1.5px solid #C8A84B\">\n<div style=\"font-size:14px;font-weight:700;color:#5a4010;margin-bottom:8px\">Formule de la prime</div>\n<div style=\"font-size:14px;color:#333;margin-bottom:8px\"><strong>Prime (%) = [(Prix de marché − Valeur métal pure) ÷ Valeur métal pure] × 100</strong></div>\n<div style=\"font-size:12px;color:#555\">Exemple : Napoléon — Cours or 85 €/g · Valeur métal = 5,806 × 85 = 493 € · Prix de marché = 570 € · Prime = (570−493)/493 × 100 = <strong>15,6%</strong></div>\n</div>\n\n<div class=\"section-title\" style=\"margin-top:16px\">Ce qui fait monter ou baisser la prime</div>\n<table class=\"tbl\"><thead><tr><th>Facteur</th><th>Effet sur la prime</th><th>Exemple concret</th></tr></thead><tbody>\n<tr><td><strong>Demande forte</strong></td><td class=\"c-red\">Prime monte</td><td>Crise financière, tensions géopolitiques → Napoléons +30%</td></tr>\n<tr><td><strong>Offre abondante</strong></td><td class=\"c-green\">Prime baisse</td><td>Beaucoup de vendeurs → prime comprimée</td></tr>\n<tr><td><strong>Reconnaissance du produit</strong></td><td class=\"c-red\">Prime haute</td><td>Napoléon reconnu partout en France — prime justifiée</td></tr>\n<tr><td><strong>Format petit</strong></td><td class=\"c-red\">Prime très haute</td><td>Lingotin 1g : prime 25-30% · Lingot 1kg : prime &lt;2%</td></tr>\n<tr><td><strong>TVA (argent)</strong></td><td class=\"c-red\">Prime intégrée</td><td>TVA 20% sur l'argent gonfle mécaniquement la prime</td></tr>\n<tr><td><strong>Avantage fiscal (or)</strong></td><td class=\"c-red\">Prime justifiée</td><td>Exonération TVA + abattements TPV = la prime est rentable</td></tr>\n</tbody></table>\n\n<div class=\"section-title\" style=\"margin-top:16px\">L'argument commercial clé sur la prime</div>\n<div class=\"card\" style=\"background:#EAF3DE;border-left:4px solid #639922\">\n<div style=\"font-size:13px;font-weight:700;color:#2D5A0E;margin-bottom:8px\">Ce qu'il faut dire au client</div>\n<div class=\"step-row\"><div class=\"step-num\" style=\"background:#639922\">1</div><div class=\"step-body\"><div class=\"step-detail\" style=\"color:#2D5A0E\"><strong>La prime se récupère à la revente.</strong> Vous payez 15% de prime aujourd'hui — mais le prochain acheteur paiera aussi 15% de prime sur le même produit. L'or est le seul actif qui vous rembourse sa prime à la sortie.</div></div></div>\n<div class=\"step-row\"><div class=\"step-num\" style=\"background:#639922\">2</div><div class=\"step-body\"><div class=\"step-detail\" style=\"color:#2D5A0E\"><strong>La prime reflète une valeur réelle :</strong> liquidité garantie, avantage fiscal, reconnaissance internationale. Un lingot 1kg a moins de prime — mais il est infiniment moins liquide.</div></div></div>\n<div class=\"step-row\"><div class=\"step-num\" style=\"background:#639922\">3</div><div class=\"step-body\"><div class=\"step-detail\" style=\"color:#2D5A0E\"><strong>Sur le long terme, la prime est marginale.</strong> Entre 2000 et 2026, l'or a été multiplié par 10 en euros. La prime initiale de 15% est devenue négligeable face à cette performance.</div></div></div>\n</div>"}, {"t": "Histoire du cours de l'or", "html": "<div class=\"section-title\">Grandes étapes — Chronologie</div>\n<table class=\"tbl\"><thead><tr><th>Période</th><th>Cours (€ ou $/oz)</th><th>Événement déclencheur</th></tr></thead><tbody>\n<tr><td>Avant 1971</td><td>35 $/oz (fixe)</td><td>Système de Bretton Woods — dollar indexé sur l'or</td></tr>\n<tr><td>1971</td><td>Libération</td><td>Nixon supprime la convertibilité dollar/or — fin du gold standard</td></tr>\n<tr><td>Janvier 1980</td><td>850 $/oz (pic)</td><td>Guerre froide, crise iranienne, inflation — sommet historique de l'époque</td></tr>\n<tr><td>1980–2001</td><td>250–450 $/oz</td><td>20 ans de baisse — taux élevés, dollar fort, ventes banques centrales</td></tr>\n<tr><td>2001</td><td>~250 $/oz</td><td>Creux historique moderne — banques centrales vendent leurs réserves</td></tr>\n<tr><td>2008</td><td>1 000 $/oz</td><td>Crise des subprimes — premier passage symbolique des 1 000 $</td></tr>\n<tr><td>Septembre 2011</td><td>1 920 $/oz (pic)</td><td>Crise de la dette souveraine européenne, QE américain</td></tr>\n<tr><td>2011–2015</td><td>1 100–1 300 $/oz</td><td>Correction — reprise économique, hausse des taux</td></tr>\n<tr><td>2020 (Covid)</td><td>2 075 $/oz (record)</td><td>Pandémie, QE massif, taux zéro — record absolu en août 2020</td></tr>\n<tr><td>2022–2024</td><td>1 800–2 100 $/oz</td><td>Guerre en Ukraine, inflation mondiale, tensions géopolitiques</td></tr>\n<tr><td>2024–2025</td><td>2 500–3 000 $/oz</td><td>Achats massifs des banques centrales (Chine, Inde), dé-dollarisation</td></tr>\n</tbody></table>\n\n<div class=\"section-title\" style=\"margin-top:16px\">Ce que ça signifie pour le conseil client</div>\n<div class=\"card\">\n<div class=\"step-row\"><div class=\"step-num\">1</div><div class=\"step-body\"><div class=\"step-label\">L'or monte en période d'incertitude</div><div class=\"step-detail\">Chaque grande crise (1980, 2008, 2020, 2024) a déclenché une hausse significative. L'or est une assurance systémique — il performe exactement quand le reste du portefeuille souffre.</div></div></div>\n<div class=\"step-row\"><div class=\"step-num\">2</div><div class=\"step-body\"><div class=\"step-label\">Les banques centrales achètent — signal fort</div><div class=\"step-detail\">Depuis 2022, les banques centrales mondiales (Chine, Inde, Turquie, Pologne) achètent de l'or à un rythme record. Ce que font les banques centrales est le signal le plus fiable sur le long terme.</div></div></div>\n<div class=\"step-row\"><div class=\"step-num\">3</div><div class=\"step-body\"><div class=\"step-label\">Depuis 2001 : x12 en 25 ans</div><div class=\"step-detail\">Un client ayant acheté 10 000 € d'or en 2001 possède aujourd'hui ~120 000 €. C'est la performance la plus régulière de tous les actifs tangibles sur cette période, hors immobilier dans certaines villes.</div></div></div>\n</div>\n<div class=\"info-box\"><strong>Argument puissant en boutique :</strong> « L'or n'a pas de rendement, mais depuis 2001 il a multiplié sa valeur par 12 en euros. Aucune obligation d'État, aucun livret n'a fait ça. Et lui ne peut pas faire faillite. »</div>"}, {"t": "Gestion du stock — Optimisation des marges", "html": "<div class=\"section-title\">Règles de base de la gestion de stock MP</div>\n<div class=\"card\">\n<div class=\"step-row\"><div class=\"step-num\">1</div><div class=\"step-body\"><div class=\"step-label\">Stock stratégique vs stock spéculatif</div><div class=\"step-detail\"><strong>Stock stratégique :</strong> ce dont les clients ont besoin régulièrement — Napoléons, lingotins 10-50g, quelques pièces 1oz. À maintenir en permanence.<br><strong>Stock spéculatif :</strong> achats opportunistes quand le cours est bas, dans l'espoir de revendre plus haut. Risque élevé — réservé à la Direction.</div></div></div>\n<div class=\"step-row\"><div class=\"step-num\">2</div><div class=\"step-body\"><div class=\"step-label\">Rotation est clé</div><div class=\"step-detail\">Un article qui dort en vitrine immobilise du capital. Objectif : rotation maximale sur les produits à forte marge (Napoléons, petits lingotins), et réapprovisionnement rapide après chaque vente.</div></div></div>\n<div class=\"step-row\"><div class=\"step-num\">3</div><div class=\"step-body\"><div class=\"step-label\">Acheter pour revendre, pas pour stocker</div><div class=\"step-detail\">La marge se fait à l'achat (rachat de fonte, lingots au bon prix) ET à la vente (prime sur les produits finis). Ne jamais stocker ce qu'on ne peut pas vendre dans les 30 jours.</div></div></div>\n</div>\n\n<div class=\"section-title\" style=\"margin-top:16px\">Matrice de marge par catégorie de produit</div>\n<table class=\"tbl\"><thead><tr><th>Catégorie</th><th>Marge brute typique</th><th>Vitesse de rotation</th><th>Recommandation stock</th></tr></thead><tbody>\n<tr><td class=\"c-green\"><strong>Napoléons 20 Fr</strong></td><td>8–15%</td><td>Très rapide</td><td>Stock permanent — 20 à 50 pièces</td></tr>\n<tr><td class=\"c-green\"><strong>Lingotins 10-20g</strong></td><td>5–10%</td><td>Rapide</td><td>Stock permanent — 5 à 10 unités</td></tr>\n<tr><td class=\"c-amber\"><strong>Krugerrand / Maple 1oz</strong></td><td>3–6%</td><td>Bonne</td><td>Stock régulier — 5 à 10 pièces</td></tr>\n<tr><td class=\"c-amber\"><strong>Lingotins 50-100g</strong></td><td>3–5%</td><td>Moyenne</td><td>Sur commande ou 2-3 unités</td></tr>\n<tr><td class=\"c-amber\"><strong>Pièces hors cote</strong></td><td>15–40%</td><td>Lente</td><td>Uniquement si acheteur identifié</td></tr>\n<tr><td class=\"c-red\"><strong>Lingots 250g+</strong></td><td>1–3%</td><td>Très lente</td><td>Sur commande uniquement</td></tr>\n<tr><td class=\"c-red\"><strong>Argent (pièces/lingots)</strong></td><td>5–12%</td><td>Lente</td><td>Stock limité — quelques pièces 1oz</td></tr>\n</tbody></table>\n\n<div class=\"section-title\" style=\"margin-top:16px\">Optimiser les marges : les 4 leviers</div>\n<div class=\"card\">\n<div class=\"step-row\"><div class=\"step-num\">1</div><div class=\"step-body\"><div class=\"step-label\">Acheter juste — le rachat de fonte</div><div class=\"step-detail\">Le rachat de fonte au client est la source de métal la moins chère. Un lingot racheté à -15% du cours spot, refondu et certifié, peut être revendu avec une prime de +10 à +20%. La marge brute sur la chaîne complète peut dépasser 25%.</div></div></div>\n<div class=\"step-row\"><div class=\"step-num\">2</div><div class=\"step-body\"><div class=\"step-label\">Vendre au bon format</div><div class=\"step-detail\">Un kilo d'or vendu en lingots de 10g génère beaucoup plus de marge qu'un lingot 1kg. Mais ça demande plus de temps et de stock. Trouver le bon équilibre selon le profil de la clientèle locale.</div></div></div>\n<div class=\"step-row\"><div class=\"step-num\">3</div><div class=\"step-body\"><div class=\"step-label\">Vendre au bon moment</div><div class=\"step-detail\">Quand le cours monte, les clients veulent vendre — c'est le moment de racheter de la fonte. Quand le cours baisse, les clients hésitent à acheter — proposer des arguments de long terme et des petits formats accessibles.</div></div></div>\n<div class=\"step-row\"><div class=\"step-num\">4</div><div class=\"step-body\"><div class=\"step-label\">Fidéliser les clients à haut potentiel</div><div class=\"step-detail\">Un client avec un compte poids génère des revenus récurrents (gardiennage) et revient régulièrement. Le contact proactif (appel quand le cours bouge) crée de la loyauté et des transactions répétées.</div></div></div>\n</div>"}, {"t": "Adapter le produit au profil client — Discours de vente", "html": "<div class=\"section-title\">Grille de recommandation produit selon le profil</div>\n<table class=\"tbl\"><thead><tr><th>Profil client</th><th>Budget</th><th>Produit recommandé</th><th>Argument clé</th></tr></thead><tbody>\n<tr><td><strong>Primo-investisseur curieux</strong></td><td>&lt; 500 €</td><td>2–3 Napoléons ou lingotin 5g</td><td>Accessibilité, liquidité, cadeau potentiel pour la famille</td></tr>\n<tr><td><strong>Épargnant régulier</strong></td><td>500–3 000 €</td><td>Napoléons + lingotin 10-20g</td><td>Mix liquidité/faible prime, diversification accessible</td></tr>\n<tr><td><strong>Investisseur patrimonial</strong></td><td>3 000–20 000 €</td><td>Lingotins 50-100g LBMA + Napoléons</td><td>Prime faible sur les lingotins, Napoléons pour la liquidité immédiate</td></tr>\n<tr><td><strong>Gros investisseur</strong></td><td>&gt; 20 000 €</td><td>Lingots 250g-1kg + compte poids</td><td>Prime minimale, compte poids évite la logistique</td></tr>\n<tr><td><strong>Cadeau / naissance</strong></td><td>100–300 €</td><td>Lingotin 1-5g coffret ou Napoléon</td><td>Aspect esthétique, valeur symbolique, format compact</td></tr>\n<tr><td><strong>Clientèle transfrontalière ESP/AND</strong></td><td>Variable</td><td>Krugerrand, Maple Leaf, Vreneli</td><td>Reconnaissance internationale, facile à revendre partout</td></tr>\n<tr><td><strong>Client avec du stock à vendre</strong></td><td>—</td><td>Proposer le rachat d'abord</td><td>Transformer un vendeur en acheteur si le cours est haut</td></tr>\n</tbody></table>\n\n<div class=\"section-title\" style=\"margin-top:18px\">Comment conduire un bon entretien de vente</div>\n<div class=\"card\">\n<div class=\"step-row\"><div class=\"step-num\">1</div><div class=\"step-body\"><div class=\"step-label\">Découverte — poser les bonnes questions</div><div class=\"step-detail\">« C'est pour vous ou pour offrir ? » · « Vous cherchez plutôt à protéger votre patrimoine ou à faire une plus-value ? » · « Vous avez déjà de l'or ou c'est un premier achat ? » · « Vous avez un horizon de détention en tête ? »</div></div></div>\n<div class=\"step-row\"><div class=\"step-num\">2</div><div class=\"step-body\"><div class=\"step-label\">Éduquer brièvement — sans submerger</div><div class=\"step-detail\">Expliquer en 30 secondes la différence or d'investissement / bijou. Expliquer la prime en 1 phrase : « Vous payez une prime pour la liquidité — et vous la récupérez à la revente. » Ne jamais noyer le client dans les détails techniques d'emblée.</div></div></div>\n<div class=\"step-row\"><div class=\"step-num\">3</div><div class=\"step-body\"><div class=\"step-label\">Recommander — être direct et confiant</div><div class=\"step-detail\">« Dans votre situation, je vous recommande les Napoléons. Voilà pourquoi : ils sont reconnus partout en France, la prime est raisonnable et vous pouvez revendre demain si vous en avez besoin. »</div></div></div>\n<div class=\"step-row\"><div class=\"step-num\">4</div><div class=\"step-body\"><div class=\"step-label\">Gérer l'objection prix</div><div class=\"step-detail\">Si le client trouve le cours trop élevé : « Le cours a multiplié par 12 depuis 2001. Ce n'est pas le cours qui est élevé — c'est l'euro qui a perdu de la valeur. » Si la prime le bloque : « Cette prime, vous la récupérez à la revente. »</div></div></div>\n<div class=\"step-row\"><div class=\"step-num\">5</div><div class=\"step-body\"><div class=\"step-label\">Clore — proposer un plan</div><div class=\"step-detail\">Pour les clients indécis : « Commencez par 2 Napoléons pour voir. Si ça vous convient, on peut mettre en place un achat régulier mensuel. » L'objectif est de créer une relation, pas de faire une vente unique.</div></div></div>\n</div>\n\n<div class=\"section-title\" style=\"margin-top:16px\">Considérer le stock disponible dans la recommandation</div>\n<div class=\"card\" style=\"background:#EAF3DE;border-left:4px solid #639922\">\n<div class=\"step-detail\" style=\"color:#2D5A0E;line-height:1.8;margin-bottom:8px\"><strong>Vendre ce qu'on a en stock</strong> est toujours plus profitable que commander pour un client hésitant. Si vous avez 20 Napoléons en stock et seulement 2 lingotins 10g, orientez naturellement le client vers les Napoléons — sans jamais sacrifier la pertinence de la recommandation.</div>\n<div class=\"step-row\"><div class=\"step-num\" style=\"background:#639922\">!</div><div class=\"step-body\"><div class=\"step-detail\" style=\"color:#2D5A0E\">Si un client demande un produit absent du stock : proposer une alternative de valeur équivalente en boutique, puis commander le produit souhaité pour sa prochaine visite. Ne jamais perdre une vente pour une question de stock.</div></div></div>\n</div>"}], "quiz": [{"q": "Quel produit a la prime la plus faible sur le marché ?", "o": ["Napoléon 20 Fr", "Lingotin 1g", "Lingot 1kg Good Delivery (LBMA)", "Pièce hors cote"], "a": 2}, {"q": "La TVA sur les pièces d'argent investissement est de :", "o": ["Exonérée comme l'or", "20%", "10%", "6,5%"], "a": 1}, {"q": "Pourquoi l'argent est-il plus volatil que l'or ?", "o": ["Car il est moins rare", "Car son marché est plus petit ET il a une forte demande industrielle", "Car les banques centrales n'en achètent pas", "Car sa prime est plus élevée"], "a": 1}, {"q": "Un client a 500 € à investir pour la première fois. Vous recommandez :", "o": ["Un lingot 1kg (faible prime)", "2-3 Napoléons ou un lingotin 5g", "De l'argent physique pour la volatilité", "Un compte poids"], "a": 1}, {"q": "Qu'est-ce qu'une pièce hors cote ?", "o": ["Une pièce rare dont la valeur dépasse 250% du cours métal", "Une pièce étrangère non reconnue en France", "Une pièce dont la TVA est exonérée", "Une pièce usée sans valeur numismatique"], "a": 0}, {"q": "La formule de la prime est :", "o": ["(Prix métal - Prix marché) / Prix marché x 100", "(Prix marché - Prix métal) / Prix métal x 100", "Prix marché / Prix métal", "Prix métal x Taux de marge"], "a": 1}, {"q": "Quelle catégorie de produit offre la meilleure marge brute en boutique ?", "o": ["Lingots 250g+", "Argent pièces 1oz", "Pièces hors cote (si acheteur identifié)", "Krugerrand 1oz"], "a": 2}, {"q": "Quand est-il stratégiquement idéal de racheter de la fonte ?", "o": ["Quand le cours baisse, car les clients vendent peu", "Quand le cours monte, car les clients veulent vendre", "En fin d'année uniquement", "Uniquement sur commande client"], "a": 1}]}];
+
+
+// ─── CONFIG ──────────────────────────────────────────────────────────────────
+var ACCESS_CODE   = "godot2025";      // Collaborateurs
+var RC_CODE       = "rc_admin";       // Responsable Conformité
+var RB_CODE       = "rb_boutique";    // Responsable Boutique
+var DIR_CODE      = "dir_fortunaqui"; // Directeur(trice)
+var MAX_ATTEMPTS  = 2;
+var MANAGER_CODES = [RC_CODE, RB_CODE, DIR_CODE];
+
+// ─── STATE ────────────────────────────────────────────────────────────────────
+var ST = {
+  user: null, poste: null, isManager: false, role: "",
+  page: "home", mod: null, sec: 0, qa: {}, qs: {}, mgrTab: "dash"
+};
+var ED = { view: "list", modId: null, tab: "info", editSection: -1, editQuiz: -1 };
+
+// ─── STORAGE ─────────────────────────────────────────────────────────────────
+function getAllData()     { try { return JSON.parse(localStorage.getItem("gf_all")  || "{}") } catch(e) { return {} } }
+function saveAll(d)      { localStorage.setItem("gf_all", JSON.stringify(d)) }
+function getUD()         { return getUserData(ST.user) }
+function saveUD(d)       { d._poste = ST.poste; saveUserData(ST.user, d) }
+function getUserData(name) {
+  var all = getAllData();
+  if (!all[name]) all[name] = { done:[], scores:{}, attempts:{}, history:{}, _poste:"" };
+  return all[name];
+}
+function saveUserData(name, data) { var all = getAllData(); all[name] = data; saveAll(all) }
+function getCustomMods() { try { return JSON.parse(localStorage.getItem("gf_custom") || "[]") } catch(e) { return [] } }
+function saveCustomMods(m) { localStorage.setItem("gf_custom", JSON.stringify(m)) }
+function getOverrides()  { try { return JSON.parse(localStorage.getItem("gf_overrides") || "{}") } catch(e) { return {} } }
+function saveOverrides(o){ localStorage.setItem("gf_overrides", JSON.stringify(o)) }
+
+// ─── MOD RESOLUTION ───────────────────────────────────────────────────────────
+function getEffectiveMod(id) {
+  var base = MODS.find(function(x) { return x.id === id });
+  if (!base) return getCustomMods().find(function(x) { return x.id === id });
+  var ov = getOverrides()[id];
+  if (!ov) return base;
+  var m = JSON.parse(JSON.stringify(base));
+  if (ov.quiz)     m.quiz     = ov.quiz;
+  if (ov.sections) m.sections = ov.sections;
+  if (ov.title)    m.title    = ov.title;
+  if (ov.dur)      m.dur      = ov.dur;
+  if (ov.level)    m.level    = ov.level;
+  return m;
+}
+function getAllMods() {
+  return MODS.map(function(m) { return getEffectiveMod(m.id) }).concat(getCustomMods());
+}
+
+// ─── HELPERS ─────────────────────────────────────────────────────────────────
+function esc(s) {
+  var r = String(s || "");
+  r = r.split("&").join("&amp;");
+  r = r.split("<").join("&lt;");
+  r = r.split(">").join("&gt;");
+  r = r.split('"').join("&quot;");
+  return r;
+}
+function setHTML(id, html) { var el = document.getElementById(id); if (el) el.innerHTML = html }
+function toast(msg) {
+  var t = document.getElementById("gf-toast");
+  if (!t) {
+    t = document.createElement("div"); t.id = "gf-toast";
+    t.style.cssText = "position:fixed;bottom:24px;right:24px;background:#1B2A4A;color:#C8A84B;padding:10px 18px;border-radius:8px;font-size:13px;font-weight:600;z-index:9999;opacity:0;transition:opacity .2s";
+    document.body.appendChild(t);
+  }
+  t.textContent = msg; t.style.opacity = "1";
+  clearTimeout(t._t); t._t = setTimeout(function() { t.style.opacity = "0" }, 2200);
+}
+
+// ─── LOGIN / LOGOUT ──────────────────────────────────────────────────────────
+function doLogin() {
+  var nom   = document.getElementById("inp-nom").value.trim();
+  var poste = document.getElementById("inp-poste").value;
+  var pwd   = document.getElementById("inp-pwd").value.trim();
+  var err   = document.getElementById("login-err");
+  if (!nom || !poste || !pwd) { err.style.display = "block"; err.textContent = "Veuillez remplir tous les champs."; return }
+  if (MANAGER_CODES.indexOf(pwd) >= 0) {
+    ST.user = nom; ST.poste = poste; ST.isManager = true;
+    ST.role = pwd === DIR_CODE ? "Directeur(trice)" : pwd === RB_CODE ? "Responsable Boutique" : "Responsable Conformité";
+    err.style.display = "none";
+    document.getElementById("login-wrap").style.display = "none";
+    document.getElementById("app-wrap").style.display = "flex";
+    document.getElementById("user-label").textContent = nom + " · " + ST.role;
+    renderManager(); return;
+  }
+  if (pwd === ACCESS_CODE) {
+    ST.user = nom; ST.poste = poste; ST.isManager = false; ST.role = "";
+    err.style.display = "none";
+    document.getElementById("login-wrap").style.display = "none";
+    document.getElementById("app-wrap").style.display = "flex";
+    document.getElementById("user-label").textContent = nom + " · " + poste;
+    goHome(); return;
+  }
+  err.style.display = "block"; err.textContent = "Code d'accès incorrect.";
+}
+function doLogout() {
+  ST.user = null; ST.isManager = false; ST.page = "home";
+  document.getElementById("login-wrap").style.display = "flex";
+  document.getElementById("app-wrap").style.display = "none";
+  document.getElementById("inp-pwd").value = "";
+}
+
+// ─── MANAGER DASHBOARD ───────────────────────────────────────────────────────
+function renderManager() {
+  ST.mgrTab = "dash";
+  setHTML("tabs",
+    '<button class="tab active" onclick="renderManager()">Tableau de bord</button>' +
+    '<button class="tab" onclick="renderEditor()">Editeur de formation</button>' +
+    '<button class="tab" onclick="doLogout()">Deconnexion</button>');
+  document.getElementById("prog").style.width = "100%";
+  var badge = document.getElementById("top-badge");
+  badge.textContent = ST.role || "Manager"; badge.className = "pill p-blue";
+
+  var all = getAllData();
+  var agents = Object.keys(all).filter(function(k) { return k !== "__mgr__" });
+  if (!agents.length) {
+    setHTML("content",
+      '<div class="mgr-hero"><div class="mgr-title">Tableau de bord — ' + esc(ST.role) + '</div>' +
+      '<div class="mgr-sub">SAS FORTUNAQUI · Perpignan</div></div>' +
+      '<div class="card" style="text-align:center;padding:32px;color:#888">Aucun collaborateur enregistré.</div>');
+    return;
+  }
+  var totalDone = 0, totalPass = 0, totalBlocked = 0;
+  agents.forEach(function(a) {
+    var d = all[a];
+    if (d.done && d.done.length === MODS.length) totalDone++;
+    MODS.forEach(function(m) {
+      var att = (d.attempts && d.attempts[m.id]) || 0;
+      var done = d.done && d.done.includes(m.id);
+      if (done) totalPass++;
+      if (att >= MAX_ATTEMPTS && !done) totalBlocked++;
+    });
+  });
+
+  var modHeaders = MODS.map(function(m) { return '<th style="text-align:center">' + m.code + '</th>' }).join("");
+  var rows = agents.map(function(agent) {
+    var d = getUserData(agent);
+    var poste2 = (all[agent] && all[agent]._poste) || "—";
+    var cells = MODS.map(function(m) {
+      var done = d.done.includes(m.id);
+      var att  = d.attempts[m.id] || 0;
+      var sc   = d.scores[m.id];
+      if (done)              return '<td style="text-align:center"><span class="pill p-green">&#10003; ' + sc + '%</span></td>';
+      if (att >= MAX_ATTEMPTS) return '<td style="text-align:center"><span class="pill p-red">Bloque</span></td>';
+      if (att > 0)           return '<td style="text-align:center"><span class="pill p-amber">' + att + "/" + MAX_ATTEMPTS + '</span></td>';
+      return '<td style="text-align:center"><span class="pill p-grey">—</span></td>';
+    }).join("");
+    var allDone2  = d.done.length === MODS.length;
+    var anyBlocked = MODS.some(function(m) { return (d.attempts[m.id] || 0) >= MAX_ATTEMPTS && !d.done.includes(m.id) });
+    var gp = allDone2 ? '<span class="pill p-green">Certifie</span>' :
+             anyBlocked ? '<span class="pill p-red">RC requis</span>' :
+             d.done.length > 0 ? '<span class="pill p-amber">' + d.done.length + "/" + MODS.length + '</span>' :
+             '<span class="pill p-grey">Debut</span>';
+    return '<tr><td><strong>' + esc(agent) + '</strong></td><td>' + esc(poste2) + '</td>' +
+           cells + '<td style="text-align:center">' + gp + '</td>' +
+           '<td style="text-align:center"><button class="det-btn" onclick="showDetail(' + JSON.stringify(agent) + ')">Voir</button></td></tr>';
+  }).join("");
+
+  setHTML("content",
+    '<div class="mgr-hero"><div class="mgr-title">Tableau de bord — ' + esc(ST.role) + '</div>' +
+    '<div class="mgr-sub">ISO 9001 §7.2 · Art. L.561-34 CMF · ' + esc(ST.user) + '</div></div>' +
+    '<div class="stat-grid">' +
+    '<div class="stat-card"><div class="stat-num">' + agents.length + '</div><div class="stat-lbl">Collaborateurs</div></div>' +
+    '<div class="stat-card"><div class="stat-num">' + totalDone + '</div><div class="stat-lbl">Certifies</div></div>' +
+    '<div class="stat-card"><div class="stat-num" style="color:#27500A">' + totalPass + '</div><div class="stat-lbl">Modules valides</div></div>' +
+    '<div class="stat-card"><div class="stat-num" style="color:#a32d2d">' + totalBlocked + '</div><div class="stat-lbl">Bloques</div></div>' +
+    '</div>' +
+    '<div style="margin-bottom:10px;display:flex;align-items:center;justify-content:space-between">' +
+    '<div style="font-size:13px;font-weight:700;color:#1B2A4A">Resultats par collaborateur</div>' +
+    '<button class="btn" style="font-size:11px;padding:6px 12px" onclick="exportCSV()">Exporter CSV</button>' +
+    '</div>' +
+    '<table class="agent-table"><thead><tr><th>Collaborateur</th><th>Poste</th>' + modHeaders +
+    '<th style="text-align:center">Statut</th><th style="text-align:center">Detail</th></tr></thead>' +
+    '<tbody>' + rows + '</tbody></table>' +
+    '<div id="modal-area"></div>');
+}
+
+function showDetail(agent) {
+  var d = getUserData(agent);
+  var all = getAllData();
+  var poste2 = (all[agent] && all[agent]._poste) || "—";
+  var modCards = MODS.map(function(m) {
+    var done = d.done.includes(m.id);
+    var att  = d.attempts[m.id] || 0;
+    var hist = (d.history && d.history[m.id]) || [];
+    var rows2 = !hist.length ? '<div style="font-size:12px;color:#aaa">Aucune tentative.</div>' :
+      hist.map(function(h, i) {
+        return '<div class="attempt-row"><span class="pill ' + (h.pass ? "p-green" : i === hist.length-1 && !h.pass && hist.length >= MAX_ATTEMPTS ? "p-red" : "p-amber") + '">' +
+          h.score + '%</span><span>' + (h.pass ? "&#10003; Valide" : "&#10007; Echec") + ' — Tentative ' + (i+1) + '</span>' +
+          '<span style="color:#aaa;margin-left:auto">' + h.date + '</span></div>';
+      }).join("");
+    var resetBtn = (att >= MAX_ATTEMPTS && !done) ?
+      '<button class="btn-reset-agent" onclick="resetAttempts(' + JSON.stringify(agent) + ',' + JSON.stringify(m.id) + ')">Autoriser une tentative</button>' : "";
+    return '<div class="mod-result"><div class="mod-result-title">' + m.code + ' — ' + esc(m.title) +
+      ' <span class="pill ' + (done ? "p-green" : att >= MAX_ATTEMPTS ? "p-red" : "p-grey") + '" style="float:right">' +
+      (done ? "Valide" : att >= MAX_ATTEMPTS ? "Bloque" : "Non valide") + '</span></div>' +
+      rows2 + resetBtn + '</div>';
+  }).join("");
+  var printBtn = d.done.length === MODS.length ?
+    '<button class="btn btn-gold" onclick="printAttestation()">Imprimer attestation</button>' : "";
+  setHTML("modal-area",
+    '<div class="modal-bg" onclick="if(event.target===this)closeModal()">' +
+    '<div class="modal"><button class="modal-close" onclick="closeModal()">x</button>' +
+    '<div class="modal-title">' + esc(agent) + '</div>' +
+    '<div class="modal-sub">' + esc(poste2) + ' · ' + d.done.length + "/" + MODS.length + ' modules valides</div>' +
+    modCards +
+    '<div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap">' +
+    '<button class="btn btn-primary" onclick="closeModal()">Fermer</button>' + printBtn +
+    '</div></div></div>');
+  window._modalAgent = agent;
+}
+function closeModal() { setHTML("modal-area", "") }
+function resetAttempts(agent, mid) {
+  if (!confirm("Autoriser une nouvelle tentative pour " + agent + " sur le module " + mid + " ?")) return;
+  var d = getUserData(agent);
+  d.attempts[mid] = Math.max(0, (d.attempts[mid] || 1) - 1);
+  if (d.history && d.history[mid]) d.history[mid].pop();
+  saveUserData(agent, d); closeModal(); renderManager();
+}
+function printAttestation() {
+  var agent = window._modalAgent; if (!agent) return;
+  var d = getUserData(agent);
+  var all2 = getAllData(); var poste2 = (all2[agent] && all2[agent]._poste) || "";
+  var date = new Date().toLocaleDateString("fr-FR");
+  var scoreRows = MODS.map(function(m) {
+    var sc = d.scores[m.id]; if (!sc && !d.done.includes(m.id)) return "";
+    return "<tr><td>" + m.code + "</td><td>" + esc(m.title) + "</td><td>" + (sc || "—") + "%</td><td style='color:#27500A;font-weight:700'>Valide</td></tr>";
+  }).join("");
+  var w = window.open("", "_blank");
+  w.document.write("<!DOCTYPE html><html><head><title>Attestation " + esc(agent) + "</title>" +
+    "<style>body{font-family:Arial,sans-serif;max-width:700px;margin:40px auto;padding:20px}" +
+    "table{width:100%;border-collapse:collapse;margin:16px 0}td,th{padding:8px 12px;border:1px solid #e0e4ea;font-size:13px}" +
+    "th{background:#1B2A4A;color:#fff}.sig{margin-top:40px;display:flex;gap:60px}" +
+    ".sig-box{flex:1}.sig-line{border-bottom:1px solid #333;margin-top:50px;margin-bottom:6px}</style>" +
+    "</head><body>" +
+    "<div style='font-size:24px;font-weight:700;color:#1B2A4A'>Godot &amp; Fils</div>" +
+    "<div style='font-size:12px;color:#C8A84B;font-weight:700;margin-bottom:30px'>SAS FORTUNAQUI · Perpignan · MAISON FONDEE EN 1933</div>" +
+    "<h1 style='font-size:20px;color:#1B2A4A;border-bottom:2px solid #C8A84B;padding-bottom:10px;margin-bottom:20px'>Attestation de Formation LCB-FT</h1>" +
+    "<p>Je soussigne(e), " + esc(ST.role || "Responsable Conformite") + " de SAS FORTUNAQUI / GODOT ET FILS Perpignan, atteste que :</p>" +
+    "<p style='margin:16px 0'><strong>" + esc(agent) + "</strong> — " + esc(poste2) + "</p>" +
+    "<p>a valide avec succes l'integralite du plan de formation metier LCB-FT.</p>" +
+    "<table><tr><th>Module</th><th>Intitule</th><th>Score</th><th>Resultat</th></tr>" + scoreRows + "</table>" +
+    "<p>Date d'emission : " + date + "</p>" +
+    "<div class='sig'><div class='sig-box'><div class='sig-line'></div><div style='font-size:11px;color:#888'>" + esc(ST.role || "Responsable Conformite") + "</div></div>" +
+    "<div class='sig-box'><div class='sig-line'></div><div style='font-size:11px;color:#888'>Direction — SAS FORTUNAQUI</div></div></div>" +
+    "</body></html>");
+  w.document.close(); w.print();
+}
+function exportCSV() {
+  var all = getAllData();
+  var agents = Object.keys(all).filter(function(k) { return k !== "__mgr__" });
+  var csv = "Collaborateur,Poste," + MODS.map(function(m) { return m.code }).join(",") + ",Statut\n";
+  agents.forEach(function(a) {
+    var d = getUserData(a);
+    var p2 = (all[a] && all[a]._poste) || "";
+    var cells = MODS.map(function(m) {
+      if (d.done.includes(m.id)) return d.scores[m.id] + "%";
+      var att = d.attempts[m.id] || 0;
+      return att >= MAX_ATTEMPTS ? "Bloque" : att > 0 ? att + "/" + MAX_ATTEMPTS : "Non commence";
+    });
+    var status = d.done.length === MODS.length ? "Certifie" : d.done.length > 0 ? d.done.length + "/" + MODS.length : "Debut";
+    csv += '"' + a + '","' + p2 + '",' + cells.join(",") + "," + status + "\n";
+  });
+  var blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement("a"); a.href = url; a.download = "formation_godot.csv"; a.click();
+}
+
+// ─── EDITOR ──────────────────────────────────────────────────────────────────
+function renderEditor() {
+  ST.mgrTab = "editor";
+  setHTML("tabs",
+    '<button class="tab" onclick="renderManager()">Tableau de bord</button>' +
+    '<button class="tab active" onclick="renderEditor()">Editeur de formation</button>' +
+    '<button class="tab" onclick="doLogout()">Deconnexion</button>');
+  document.getElementById("prog").style.width = "100%";
+  document.getElementById("top-badge").textContent = "Editeur";
+  document.getElementById("top-badge").className = "pill p-blue";
+  if (ED.view === "list") renderEditorList();
+  else if (ED.view === "edit" || ED.view === "new") renderEditorForm(ED.modId);
+  else if (ED.view === "builtin") renderEditorBuiltin(ED.modId);
+}
+
+function renderEditorList() {
+  ED.view = "list";
+  var overrides = getOverrides();
+  var custom = getCustomMods();
+  var builtinCards = MODS.map(function(m) {
+    var hasOv = !!overrides[m.id];
+    return '<div class="ed-card built-in">' +
+      '<div class="ed-card-code">' + m.code + '</div>' +
+      '<div><div class="ed-card-title">' + esc(m.title) + (hasOv ? ' <span style="color:#C8A84B;font-size:10px">modifie</span>' : "") + '</div>' +
+      '<div class="ed-card-meta">' + esc(m.dur) + " · " + esc(m.level) + " · " + m.sections.length + " sections · " + m.quiz.length + " questions</div></div>" +
+      '<div class="ed-card-actions">' +
+      '<button class="ed-btn-sm" onclick="startEditBuiltin(' + JSON.stringify(m.id) + ')">Modifier questions</button>' +
+      (hasOv ? '<button class="ed-btn-sm danger" onclick="doResetBuiltin(' + JSON.stringify(m.id) + ')">Reinit</button>' : "") +
+      '</div></div>';
+  }).join("");
+  var customCards = !custom.length ?
+    '<div style="text-align:center;padding:24px;color:#aaa;font-size:13px;background:#f8f9fb;border-radius:10px;border:1px dashed #dde1e7">Aucun module personnalise.<br>Cliquez sur <strong>+ Nouveau module</strong></div>' :
+    custom.map(function(m) {
+      return '<div class="ed-card custom">' +
+        '<div class="ed-card-code" style="color:#C8A84B">' + (m.code || "?") + '</div>' +
+        '<div><div class="ed-card-title">' + esc(m.title) + '</div>' +
+        '<div class="ed-card-meta">' + esc(m.dur || "—") + " · " + ((m.sections || []).length) + " sections · " + ((m.quiz || []).length) + " questions</div></div>" +
+        '<div class="ed-card-actions">' +
+        '<button class="ed-btn-sm" onclick="startEditCustom(' + JSON.stringify(m.id) + ')">Modifier</button>' +
+        '<button class="ed-btn-sm danger" onclick="doDeleteCustom(' + JSON.stringify(m.id) + ')">Supprimer</button>' +
+        '</div></div>';
+    }).join("");
+  setHTML("content",
+    '<div class="ed-wrap">' +
+    '<div class="ed-toolbar"><div class="ed-title">Editeur de formation</div>' +
+    '<button class="btn btn-gold" onclick="startNewModule()">+ Nouveau module</button></div>' +
+    '<div style="font-size:12px;font-weight:700;color:#1B2A4A;margin-bottom:8px">Modules integres</div>' +
+    builtinCards +
+    '<div style="font-size:12px;font-weight:700;color:#1B2A4A;margin:16px 0 8px">Modules personnalises</div>' +
+    customCards +
+    '<div class="info-box" style="margin-top:12px">Les modules personnalises sont sauvegardes localement. Les modifications des modules integres (questions) sont aussi sauvegardees localement — utilisez Exporter pour les rendre permanents.</div>' +
+    '</div>');
+}
+
+// ── Built-in module editor (quiz only) ────────────────────────────────────────
+function startEditBuiltin(id) {
+  ED.view = "builtin"; ED.modId = id; ED.editQuiz = -1;
+  var ov = getOverrides();
+  if (!ov[id]) {
+    var base = MODS.find(function(x) { return x.id === id });
+    ov[id] = { quiz: JSON.parse(JSON.stringify(base.quiz)) };
+    saveOverrides(ov);
+  }
+  renderEditorBuiltin(id);
+}
+function doResetBuiltin(id) {
+  if (!confirm("Reinitialiser le module " + id + " a sa version originale ? Toutes vos modifications seront perdues.")) return;
+  var ov = getOverrides(); delete ov[id]; saveOverrides(ov);
+  renderEditorList(); toast("Module reinitialise");
+}
+function renderEditorBuiltin(id) {
+  ED.view = "builtin"; ED.modId = id;
+  var ov = getOverrides();
+  var base = MODS.find(function(x) { return x.id === id });
+  var quizArr = (ov[id] && ov[id].quiz) ? ov[id].quiz : base.quiz;
+  var qItems = quizArr.map(function(q, qi) {
+    var isEdit = ED.editQuiz === qi;
+    var editForm = isEdit ? (
+      '<div style="margin-top:10px">' +
+      '<div class="ed-form-group"><label class="ed-form-label">Question</label>' +
+      '<input class="ed-form-input" id="bq-txt" value="' + esc(q.q || "") + '"></div>' +
+      [0,1,2,3].map(function(oi) {
+        return '<div class="ed-form-group"><label class="ed-form-label">Reponse ' + ["A","B","C","D"][oi] +
+          ' <input type="radio" name="bq-cor" value="' + oi + '" ' + (q.a === oi ? "checked" : "") + '>  Bonne</label>' +
+          '<input class="ed-form-input" id="bq-opt-' + oi + '" value="' + esc((q.o || [])[oi] || "") + '"></div>';
+      }).join("") +
+      '<div style="display:flex;gap:8px">' +
+      '<button class="btn btn-primary" onclick="saveBuiltinQ(' + qi + ')">Enregistrer</button>' +
+      '<button class="btn" onclick="ED.editQuiz=-1;renderEditorBuiltin(ED.modId)">Annuler</button></div></div>'
+    ) : "";
+    return '<div class="ed-quiz-item">' +
+      '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">' +
+      '<span class="ed-quiz-num">Q' + (qi+1) + '</span>' +
+      '<span style="font-size:12px;color:#1B2A4A;flex:1;font-weight:600">' + esc(q.q) + '</span>' +
+      '<button class="ed-btn-sm" onclick="ED.editQuiz=' + qi + ';renderEditorBuiltin(ED.modId)">Modifier</button>' +
+      '</div>' + editForm + '</div>';
+  }).join("");
+  setHTML("content",
+    '<div class="ed-wrap">' +
+    '<div class="ed-toolbar">' +
+    '<div><div class="ed-title">Modifier : ' + esc(base.title) + '</div>' +
+    '<div style="font-size:11px;color:#888;margin-top:2px">Modification des questions uniquement</div></div>' +
+    '<div style="display:flex;gap:8px">' +
+    '<button class="btn" onclick="renderEditorList()">Retour</button>' +
+    '<button class="btn danger" onclick="doResetBuiltin(' + JSON.stringify(id) + ')" style="background:#fff5f5;color:#a32d2d;border-color:#fbb">Reinitialiser</button>' +
+    '</div></div>' + qItems +
+    '<div class="ok-box" style="margin-top:10px">Modifiez les questions pour ajuster les nuances. Reinitialiser revient a la version officielle.</div>' +
+    '</div>');
+}
+function saveBuiltinQ(qi) {
+  var id = ED.modId;
+  var ov = getOverrides();
+  if (!ov[id] || !ov[id].quiz) {
+    var base = MODS.find(function(x) { return x.id === id });
+    if (!ov[id]) ov[id] = {};
+    ov[id].quiz = JSON.parse(JSON.stringify(base.quiz));
+  }
+  ov[id].quiz[qi].q = document.getElementById("bq-txt").value.trim() || "Question ?";
+  ov[id].quiz[qi].o = [0,1,2,3].map(function(oi) {
+    return document.getElementById("bq-opt-" + oi).value.trim() || "Reponse " + (oi+1);
+  });
+  var sel = document.querySelector("input[name='bq-cor']:checked");
+  ov[id].quiz[qi].a = sel ? parseInt(sel.value) : 0;
+  saveOverrides(ov);
+  ED.editQuiz = -1;
+  renderEditorBuiltin(id);
+  toast("Question sauvegardee");
+}
+
+// ── Custom module editor ───────────────────────────────────────────────────────
+function startNewModule() {
+  var m = {
+    id: "custom_" + Date.now(), code: "MOD", title: "Nouveau module",
+    dur: "1h", level: "Tous niveaux", isCustom: true,
+    sections: [{ t: "Section 1", html: '<div class="card">Contenu a rediger.</div>' }],
+    quiz: [{ q: "Question ?", o: ["Reponse A","Reponse B","Reponse C","Reponse D"], a: 0 }]
+  };
+  var c = getCustomMods(); c.push(m); saveCustomMods(c);
+  ED.view = "edit"; ED.modId = m.id; ED.tab = "info"; ED.editSection = -1; ED.editQuiz = -1;
+  renderEditor();
+}
+function startEditCustom(id) { ED.view = "edit"; ED.modId = id; ED.tab = "info"; ED.editSection = -1; ED.editQuiz = -1; renderEditor() }
+function doDeleteCustom(id) {
+  var m = getCustomMods().find(function(x) { return x.id === id });
+  if (!confirm("Supprimer " + (m ? m.title : id) + " ?")) return;
+  saveCustomMods(getCustomMods().filter(function(x) { return x.id !== id }));
+  renderEditorList();
+}
+function renderEditorForm(id) {
+  var c = getCustomMods(); var m = c.find(function(x) { return x.id === id });
+  if (!m) { renderEditorList(); return }
+  var tab = ED.tab || "info";
+  var tabs2 =
+    '<div class="ed-tabs-inner">' +
+    '<button class="ed-tab-inner ' + (tab === "info" ? "active" : "") + '" onclick="ED.tab=\'info\';renderEditorForm(ED.modId)">Informations</button>' +
+    '<button class="ed-tab-inner ' + (tab === "sections" ? "active" : "") + '" onclick="ED.tab=\'sections\';renderEditorForm(ED.modId)">Sections (' + m.sections.length + ')</button>' +
+    '<button class="ed-tab-inner ' + (tab === "quiz" ? "active" : "") + '" onclick="ED.tab=\'quiz\';renderEditorForm(ED.modId)">Evaluation (' + m.quiz.length + ' Q)</button>' +
+    '</div>';
+  setHTML("content",
+    '<div class="ed-wrap">' +
+    '<div class="ed-toolbar">' +
+    '<div><div class="ed-title">Modifier : ' + esc(m.title) + '</div><div style="font-size:11px;color:#888;margin-top:2px">Module personnalise</div></div>' +
+    '<div style="display:flex;gap:8px">' +
+    '<button class="btn" onclick="renderEditorList()">Retour</button>' +
+    '<button class="btn btn-gold" onclick="exportCustom(' + JSON.stringify(id) + ')">Exporter</button>' +
+    '</div></div>' + tabs2 +
+    '<div id="ed-tab-content">' + renderEdTab(m, tab) + '</div></div>');
+}
+function renderEdTab(m, tab) {
+  if (tab === "info") return renderInfoTab(m);
+  if (tab === "sections") return renderSectionsTab(m);
+  if (tab === "quiz") return renderQuizTabEd(m);
+  return "";
+}
+function renderInfoTab(m) {
+  return '<div class="ed-form">' +
+    '<div class="ed-form-group"><label class="ed-form-label">Code</label><input class="ed-form-input" id="ed-code" value="' + esc(m.code || "") + '" maxlength="6"></div>' +
+    '<div class="ed-form-group"><label class="ed-form-label">Titre</label><input class="ed-form-input" id="ed-title" value="' + esc(m.title || "") + '"></div>' +
+    '<div class="ed-form-group"><label class="ed-form-label">Duree</label><input class="ed-form-input" id="ed-dur" value="' + esc(m.dur || "") + '"></div>' +
+    '<div class="ed-form-group"><label class="ed-form-label">Niveau</label><input class="ed-form-input" id="ed-level" value="' + esc(m.level || "") + '"></div>' +
+    '<div class="ed-form-group"><label class="ed-form-label">Acces restreint manager ?</label>' +
+    '<select class="ed-form-select" id="ed-restricted"><option value="0" ' + (!m.managerOnly ? "selected" : "") + '>Non — tous les collaborateurs</option>' +
+    '<option value="1" ' + (m.managerOnly ? "selected" : "") + '>Oui — manager uniquement</option></select></div>' +
+    '<button class="btn btn-primary" style="width:100%" onclick="saveInfoTab(' + JSON.stringify(m.id) + ')">Enregistrer</button></div>';
+}
+function saveInfoTab(id) {
+  var c = getCustomMods(); var m = c.find(function(x) { return x.id === id }); if (!m) return;
+  m.code  = (document.getElementById("ed-code").value.trim().toUpperCase() || "MOD");
+  m.title = document.getElementById("ed-title").value.trim() || "Module";
+  m.dur   = document.getElementById("ed-dur").value.trim() || "—";
+  m.level = document.getElementById("ed-level").value.trim() || "Tous niveaux";
+  m.managerOnly = document.getElementById("ed-restricted").value === "1";
+  saveCustomMods(c); renderEditorForm(id); toast("Sauvegarde");
+}
+function renderSectionsTab(m) {
+  var items = m.sections.map(function(s, i) {
+    var isEdit = ED.editSection === i;
+    var editForm = isEdit ? (
+      '<div style="margin-top:10px">' +
+      '<div class="ed-form-group"><label class="ed-form-label">Titre section</label>' +
+      '<input class="ed-form-input" id="sec-title" value="' + esc(s.t || "") + '"></div>' +
+      '<div class="ed-form-group"><label class="ed-form-label">Contenu HTML</label>' +
+      '<textarea class="ed-form-textarea" id="sec-html" style="min-height:160px;font-family:monospace;font-size:12px">' + esc(s.html || "") + '</textarea></div>' +
+      '<div style="display:flex;gap:8px">' +
+      '<button class="btn btn-primary" onclick="saveSection(' + JSON.stringify(m.id) + ',' + i + ')">Enregistrer</button>' +
+      '<button class="btn" onclick="ED.editSection=-1;renderEditorForm(ED.modId)">Annuler</button></div></div>'
+    ) : "";
+    var btns = '<div style="display:flex;gap:5px">' +
+      (i > 0 ? '<button class="ed-btn-sm" onclick="moveSection(' + JSON.stringify(m.id) + ',' + i + ',-1)">haut</button>' : "") +
+      (i < m.sections.length-1 ? '<button class="ed-btn-sm" onclick="moveSection(' + JSON.stringify(m.id) + ',' + i + ',1)">bas</button>' : "") +
+      '<button class="ed-btn-sm" onclick="ED.editSection=' + i + ';renderEditorForm(ED.modId)">Modifier</button>' +
+      '<button class="ed-btn-sm danger" onclick="deleteSection(' + JSON.stringify(m.id) + ',' + i + ')">X</button></div>';
+    return '<div class="ed-section-item">' +
+      '<div class="ed-section-item-header"><span class="ed-section-num">' + (i+1) + '</span>' +
+      '<strong style="font-size:13px;color:#1B2A4A;flex:1">' + esc(s.t) + '</strong>' + btns + '</div>' +
+      editForm + '</div>';
+  }).join("");
+  return items + '<button class="btn btn-primary" style="width:100%;margin-top:8px" onclick="addSection(' + JSON.stringify(m.id) + ')">+ Ajouter une section</button>' +
+    '<div style="font-size:11px;color:#aaa;margin-top:6px">Classes HTML : card · tbl · alert-box · ok-box · info-box · step-row + step-num + step-label + step-detail</div>';
+}
+function saveSection(id, i) {
+  var c = getCustomMods(); var m = c.find(function(x) { return x.id === id }); if (!m) return;
+  m.sections[i].t    = document.getElementById("sec-title").value.trim() || "Section";
+  m.sections[i].html = document.getElementById("sec-html").value;
+  saveCustomMods(c); ED.editSection = -1; ED.tab = "sections"; renderEditorForm(id); toast("Section sauvegardee");
+}
+function moveSection(id, i, dir) {
+  var c = getCustomMods(); var m = c.find(function(x) { return x.id === id });
+  var tmp = m.sections[i]; m.sections[i] = m.sections[i+dir]; m.sections[i+dir] = tmp;
+  saveCustomMods(c); ED.tab = "sections"; renderEditorForm(id);
+}
+function deleteSection(id, i) {
+  if (!confirm("Supprimer ?")) return;
+  var c = getCustomMods(); var m = c.find(function(x) { return x.id === id });
+  m.sections.splice(i, 1); saveCustomMods(c); ED.tab = "sections"; renderEditorForm(id);
+}
+function addSection(id) {
+  var c = getCustomMods(); var m = c.find(function(x) { return x.id === id });
+  m.sections.push({ t: "Nouvelle section", html: '<div class="card">Contenu a rediger.</div>' });
+  saveCustomMods(c); ED.tab = "sections"; ED.editSection = m.sections.length - 1; renderEditorForm(id);
+}
+function renderQuizTabEd(m) {
+  var items = m.quiz.map(function(q, qi) {
+    var isEdit = ED.editQuiz === qi;
+    var editForm = isEdit ? (
+      '<div style="margin-top:10px">' +
+      '<div class="ed-form-group"><label class="ed-form-label">Question</label>' +
+      '<input class="ed-form-input" id="cq-txt" value="' + esc(q.q || "") + '"></div>' +
+      [0,1,2,3].map(function(oi) {
+        return '<div class="ed-form-group"><label class="ed-form-label">Reponse ' + ["A","B","C","D"][oi] +
+          ' <input type="radio" name="cq-cor" value="' + oi + '" ' + (q.a === oi ? "checked" : "") + '>  Bonne</label>' +
+          '<input class="ed-form-input" id="cq-opt-' + oi + '" value="' + esc((q.o || [])[oi] || "") + '"></div>';
+      }).join("") +
+      '<div style="display:flex;gap:8px">' +
+      '<button class="btn btn-primary" onclick="saveCustomQ(' + JSON.stringify(m.id) + ',' + qi + ')">Enregistrer</button>' +
+      '<button class="btn" onclick="ED.editQuiz=-1;renderEditorForm(ED.modId)">Annuler</button></div></div>'
+    ) : "";
+    return '<div class="ed-quiz-item">' +
+      '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">' +
+      '<span class="ed-quiz-num">Q' + (qi+1) + '</span>' +
+      '<span style="font-size:12px;color:#1B2A4A;flex:1;font-weight:600">' + esc(q.q) + '</span>' +
+      '<div style="display:flex;gap:5px">' +
+      '<button class="ed-btn-sm" onclick="ED.editQuiz=' + qi + ';renderEditorForm(ED.modId)">Modifier</button>' +
+      '<button class="ed-btn-sm danger" onclick="deleteCustomQ(' + JSON.stringify(m.id) + ',' + qi + ')">X</button>' +
+      '</div></div>' + editForm + '</div>';
+  }).join("");
+  return items + '<button class="btn btn-primary" style="width:100%;margin-top:8px" onclick="addCustomQ(' + JSON.stringify(m.id) + ')">+ Ajouter une question</button>';
+}
+function saveCustomQ(id, qi) {
+  var c = getCustomMods(); var m = c.find(function(x) { return x.id === id }); if (!m) return;
+  m.quiz[qi].q = document.getElementById("cq-txt").value.trim() || "Question ?";
+  m.quiz[qi].o = [0,1,2,3].map(function(oi) { return document.getElementById("cq-opt-" + oi).value.trim() || "Reponse " + (oi+1) });
+  var sel = document.querySelector("input[name='cq-cor']:checked");
+  m.quiz[qi].a = sel ? parseInt(sel.value) : 0;
+  saveCustomMods(c); ED.editQuiz = -1; ED.tab = "quiz"; renderEditorForm(id); toast("Question sauvegardee");
+}
+function deleteCustomQ(id, qi) {
+  if (!confirm("Supprimer ?")) return;
+  var c = getCustomMods(); var m = c.find(function(x) { return x.id === id });
+  m.quiz.splice(qi, 1); saveCustomMods(c); ED.tab = "quiz"; renderEditorForm(id);
+}
+function addCustomQ(id) {
+  var c = getCustomMods(); var m = c.find(function(x) { return x.id === id });
+  m.quiz.push({ q: "Nouvelle question ?", o: ["Reponse A","Reponse B","Reponse C","Reponse D"], a: 0 });
+  saveCustomMods(c); ED.tab = "quiz"; ED.editQuiz = m.quiz.length - 1; renderEditorForm(id);
+}
+function exportCustom(id) {
+  var m = getCustomMods().find(function(x) { return x.id === id }); if (!m) return;
+  var code = JSON.stringify(m, null, 2);
+  setHTML("content",
+    '<div class="ed-wrap"><div class="ed-toolbar">' +
+    '<div class="ed-title">Export — ' + esc(m.title) + '</div>' +
+    '<button class="btn" onclick="startEditCustom(' + JSON.stringify(id) + ')">Retour</button></div>' +
+    '<div class="card" style="margin-bottom:12px"><div style="font-size:12px;font-weight:700;color:#1B2A4A;margin-bottom:6px">Integration permanente</div>' +
+    '<div style="font-size:12px;color:#555;line-height:1.7">Copiez ce JSON et envoyez-le a Claude pour integration definitive dans le fichier HTML.</div></div>' +
+    '<textarea style="width:100%;height:300px;font-family:monospace;font-size:11px;padding:12px;border:1.5px solid #e0e4ea;border-radius:8px;background:#f8f9fb" onclick="this.select()">' + esc(code) + '</textarea>' +
+    '<button class="btn btn-primary" style="width:100%;margin-top:10px" onclick="navigator.clipboard.writeText(document.querySelector(\'textarea\').value).then(function(){toast(\'Copie\')})">Copier</button>' +
+    '</div>');
+}
+
+// ─── APP NAVIGATION ───────────────────────────────────────────────────────────
+function renderTabs() {
+  var d = getUD();
+  var tabs = '<button class="tab' + (ST.page === "home" ? " active" : "") + '" onclick="goHome()">Accueil</button>';
+  getAllMods().forEach(function(m) {
+    var done    = d.done.includes(m.id);
+    var att     = d.attempts[m.id] || 0;
+    var locked  = att >= MAX_ATTEMPTS && !done && !ST.isManager;
+    var mgr     = (m.id === "m6" || (m.isCustom && m.managerOnly)) && !ST.isManager;
+    var active  = ST.page === "mod" && ST.mod === m.id;
+    var stl     = locked ? ' style="color:#e24b4a"' : mgr ? ' style="color:#aaa"' : "";
+    var prefix  = locked ? "🔒 " : done ? "✓ " : "";
+    tabs += '<button class="tab' + (active ? " active" : "") + (done ? " done" : "") + '"' + stl + ' onclick="goMod(' + JSON.stringify(m.id) + ')">' + prefix + m.code + " " + esc(m.title) + '</button>';
+  });
+  setHTML("tabs", tabs);
+}
+function renderProg() {
+  var d = getUD();
+  var p = Math.round(d.done.length / getAllMods().length * 100);
+  document.getElementById("prog").style.width = p + "%";
+  var b = document.getElementById("top-badge");
+  var allDone = d.done.length === getAllMods().length;
+  b.textContent = allDone ? "Formation validee ✓" : d.done.length + "/" + getAllMods().length + " modules";
+  b.className = "pill " + (allDone ? "p-green" : "p-amber");
+}
+
+// ─── HOME ─────────────────────────────────────────────────────────────────────
+function doReset() {
+  if (confirm("Reinitialiser toute la progression ?")) { localStorage.removeItem("gf_all"); location.reload() }
+}
+function goHome() {
+  ST.page = "home"; ST.mod = null; ST.sec = 0;
+  renderTabs(); renderProg();
+  var d = getUD();
+  var allMods = getAllMods();
+  var allDone = d.done.length === allMods.length;
+  var cert = allDone ?
+    '<div class="cert-box"><div class="cert-title">Formation Validee — ' + esc(ST.user) + '</div>' +
+    '<div class="cert-sub">Tous les modules valides · Attestation disponible aupres du RC</div></div>' : "";
+  var cards = allMods.map(function(m) {
+    var done   = d.done.includes(m.id);
+    var att    = d.attempts[m.id] || 0;
+    var locked = att >= MAX_ATTEMPTS && !done && !ST.isManager;
+    var mgr    = (m.id === "m6" || (m.isCustom && m.managerOnly)) && !ST.isManager;
+    var sc     = d.scores[m.id];
+    var attLeft = Math.max(0, MAX_ATTEMPTS - att);
+    var scol = done ? "#27500A" : (locked || mgr) ? "#a32d2d" : att > 0 ? "#633806" : "#aaa";
+    var stxt = done ? "✓ Valide — " + sc + "%" :
+               mgr ? "🔐 Acces manager uniquement" :
+               locked ? "🔒 Bloque — contactez le RC" :
+               att > 0 ? att + "/" + MAX_ATTEMPTS + " tentative(s) — " + attLeft + " restante(s)" :
+               m.id === "m5" ? "★ Expert Orion Academy" :
+               m.id === "m6" ? "★ Module Manager" : "";
+    return '<div class="mc' + (done ? " done" : "") + (locked || mgr ? " locked" : "") + '" onclick="goMod(' + JSON.stringify(m.id) + ')">' +
+      '<div class="mc-code">' + m.code + '</div>' +
+      '<div class="mc-title">' + esc(m.title) + '</div>' +
+      '<div class="mc-meta">' + esc(m.dur) + " · " + esc(m.level) + '</div>' +
+      '<div class="mc-status" style="color:' + scol + '">' + stxt + '</div></div>';
+  }).join("");
+  var nextMod = allMods.find(function(m) { var d2 = getUD(); return !d2.done.includes(m.id) && (d2.attempts[m.id] || 0) < MAX_ATTEMPTS }) || allMods[0];
+  var btnTxt  = !d.done.length ? "Commencer →" : allDone ? "Revoir les modules" : "Continuer →";
+  setHTML("content",
+    cert + '<div class="home-grid">' + cards + '</div>' +
+    '<div class="btn-row" style="justify-content:flex-start;margin-top:0">' +
+    '<button class="btn btn-primary" onclick="goMod(' + JSON.stringify(nextMod.id) + ')">' + btnTxt + '</button>' +
+    (d.done.length > 0 ? '<button class="btn" onclick="doReset()">Reinitialiser</button>' : "") +
+    '</div>');
+}
+
+// ─── MODULE NAV ───────────────────────────────────────────────────────────────
+function goMod(id) {
+  var m  = getAllMods().find(function(x) { return x.id === id }); if (!m) return;
+  var d  = getUD();
+  var att  = d.attempts[id] || 0;
+  var done = d.done.includes(id);
+  if ((m.id === "m6" || (m.isCustom && m.managerOnly)) && !ST.isManager) {
+    alert("Module Manager\n\nAcces reserve aux managers."); return;
+  }
+  if (m.id === "m5") {
+    var bases = ["m1","m2","m3","m4"];
+    var ok    = bases.every(function(mid) { return d.done.includes(mid) });
+    if (!ok && !ST.isManager) {
+      alert("Masters of Gold\n\nAccessible apres M1 a M4.\nModules manquants : " +
+        bases.filter(function(mid) { return !d.done.includes(mid) }).join(", ")); return;
+    }
+  }
+  if (att >= MAX_ATTEMPTS && !done && !ST.isManager) {
+    alert("Module bloque — 2 tentatives epuisees.\nContactez le Responsable."); return;
+  }
+  ST.page = "mod"; ST.mod = id; ST.sec = 0; ST.qa = {}; ST.qs = {};
+  renderTabs(); renderProg(); renderSec();
+}
+
+function renderSec() {
+  var m = getAllMods().find(function(x) { return x.id === ST.mod }); if (!m) return;
+  if (ST.sec === m.sections.length) { renderQuiz(m); return }
+  var sec = m.sections[ST.sec];
+  var prevBtn = ST.sec > 0 ? '<button class="btn" onclick="ST.sec--;renderSec()">← Precedent</button>' : "";
+  var nextLbl = ST.sec < m.sections.length - 1 ? "Section suivante →" : "Passer l'evaluation →";
+  setHTML("content",
+    '<div class="hero"><div class="hero-code">' + m.code + " · Section " + (ST.sec+1) + "/" + m.sections.length + '</div>' +
+    '<div class="hero-title">' + esc(sec.t) + '</div>' +
+    '<div class="hero-meta"><span>' + esc(m.title) + '</span><span>' + esc(m.dur) + " · " + esc(m.level) + '</span></div></div>' +
+    '<div class="section">' + sec.html + '</div>' +
+    '<div class="btn-row">' + prevBtn +
+    '<button class="btn" onclick="goHome()">Accueil</button>' +
+    '<button class="btn btn-primary" onclick="ST.sec++;renderSec()">' + nextLbl + '</button></div>');
+  window.scrollTo(0, 0);
+  if (typeof calcLingot === "function" && document.getElementById("calc-brut")) calcLingot();
+  if (typeof calcTax    === "function" && document.getElementById("t-vente"))   calcTax();
+}
+
+// ─── QUIZ ─────────────────────────────────────────────────────────────────────
+function renderQuiz(m) {
+  var d      = getUD();
+  var att    = d.attempts[m.id] || 0;
+  var attLeft= MAX_ATTEMPTS - att;
+  var sub    = ST.qs[m.id];
+  var attBar = !sub ?
+    '<div class="attempts-bar">' +
+    Array.from({ length: MAX_ATTEMPTS }).map(function(_, i) {
+      return '<div class="att-dot ' + (i < att ? "att-used" : "att-avail") + '"></div>';
+    }).join("") +
+    '<span>' + attLeft + " tentative" + (attLeft > 1 ? "s" : "") + " restante" + (attLeft > 1 ? "s" : "") + " sur " + MAX_ATTEMPTS + '</span></div>' : "";
+  var questions = m.quiz.map(function(q, qi) {
+    var ua = ST.qa[qi];
+    var opts = q.o.map(function(opt, oi) {
+      var cls = "quiz-opt", rc = "radio";
+      if (sub) {
+        if (oi === q.a)               { cls += " correct"; rc += " cr" }
+        else if (oi === ua && ua !== q.a) { cls += " wrong";   rc += " wr" }
+      } else if (oi === ua) { cls += " selected"; rc += " filled" }
+      var cl = sub ? "" : 'onclick="selA(' + qi + ',' + oi + ')"';
+      return '<div class="' + cls + '" ' + cl + '><div class="' + rc + '"></div>' + esc(opt) + '</div>';
+    }).join("");
+    return '<div class="quiz-q"><div class="quiz-qnum">Question ' + (qi+1) + "/" + m.quiz.length + '</div>' +
+      '<div class="quiz-qtxt">' + esc(q.q) + '</div>' + opts + '</div>';
+  }).join("");
+  var submitBtn = !sub ?
+    '<button class="btn btn-gold" onclick="subQ(' + JSON.stringify(m.id) + ')">Soumettre l\'evaluation</button>' : "";
+  setHTML("content",
+    '<div class="hero" style="background:#2d1f6e"><div class="hero-code">Evaluation — ' + m.code + '</div>' +
+    '<div class="hero-title">' + esc(m.title) + '</div>' +
+    '<div class="hero-meta"><span>' + m.quiz.length + ' questions</span><span>Score minimum : 80%</span></div></div>' +
+    attBar + questions +
+    '<div class="btn-row">' +
+    '<button class="btn" onclick="ST.sec=getAllMods().find(function(x){return x.id===ST.mod}).sections.length-1;renderSec()">← Retour au cours</button>' +
+    submitBtn + '</div>');
+  window.scrollTo(0, 0);
+}
+function selA(qi, oi) {
+  ST.qa[qi] = oi;
+  renderQuiz(getAllMods().find(function(x) { return x.id === ST.mod }));
+}
+function subQ(mid) {
+  var m  = getAllMods().find(function(x) { return x.id === mid });
+  var ok = 0;
+  m.quiz.forEach(function(q, i) { if (ST.qa[i] === q.a) ok++ });
+  var sc   = Math.round(ok / m.quiz.length * 100);
+  var pass = sc >= 80;
+  var d    = getUD();
+  if (!d.attempts[mid]) d.attempts[mid] = 0;
+  d.attempts[mid]++;
+  if (!d.history) d.history = {};
+  if (!d.history[mid]) d.history[mid] = [];
+  d.history[mid].push({ score: sc, pass: pass, date: new Date().toLocaleDateString("fr-FR") });
+  if (pass && !d.done.includes(mid)) d.done.push(mid);
+  d.scores[mid] = sc;
+  saveUD(d); ST.qs[mid] = true; renderProg(); renderTabs();
+  var att     = d.attempts[mid];
+  var attLeft = Math.max(0, MAX_ATTEMPTS - att);
+  var nxtIdx  = getAllMods().findIndex(function(x) { return x.id === mid });
+  var hasNext = nxtIdx < getAllMods().length - 1;
+  var nextBtn = pass && hasNext ?
+    '<button class="btn btn-primary" onclick="goMod(' + JSON.stringify(getAllMods()[nxtIdx+1].id) + ')">Module suivant →</button>' : "";
+  var retryBtn = !pass && attLeft > 0 ?
+    '<button class="btn btn-primary" onclick="ST.qa={};ST.qs[' + JSON.stringify(mid) + ']=false;renderSec()">Revoir le cours</button>' : "";
+  var msg = pass ? "Score ≥ 80% — module valide. Attestation a signer aupres du RC." :
+            attLeft > 0 ? "Score &lt; 80%. Il vous reste <strong>" + attLeft + " tentative" + (attLeft > 1 ? "s" : "") + "</strong>. Relisez le cours." :
+            "<strong>Les 2 tentatives sont epuisees.</strong> Contactez votre Responsable.";
+  setHTML("content",
+    '<div class="score-wrap">' +
+    '<div class="score-circle ' + (pass ? "sc-pass" : "sc-fail") + '">' +
+    '<div class="sc-num" style="color:' + (pass ? "#27500A" : "#7a1a1a") + '">' + sc + '%</div>' +
+    '<div class="sc-sub">' + ok + "/" + m.quiz.length + '</div></div>' +
+    '<div style="font-size:20px;font-weight:700;color:' + (pass ? "#3B6D11" : "#a32d2d") + ';margin-bottom:8px">' + (pass ? "Module valide ✓" : "Score insuffisant") + '</div>' +
+    '<div style="font-size:13px;color:#666;max-width:420px;margin:0 auto;line-height:1.7">' + msg + '</div></div>' +
+    '<div class="btn-row" style="justify-content:center">' + retryBtn + nextBtn +
+    '<button class="btn" onclick="goHome()">Accueil</button></div>');
+  window.scrollTo(0, 0);
+}
+
+// ─── CALCULATORS ─────────────────────────────────────────────────────────────
+function calcLingot() {
+  var b  = parseFloat(document.getElementById("calc-brut").value)  || 0;
+  var t  = parseFloat(document.getElementById("calc-titre").value) || 0;
+  var c  = parseFloat(document.getElementById("calc-cours").value) || 0;
+  var mg = parseFloat(document.getElementById("calc-marge").value) || 0;
+  var fin   = b * (t / 1000);
+  var val   = fin * c;
+  var prix  = val * (1 - mg / 100);
+  var marge = val - prix;
+  document.getElementById("res-poids").textContent  = fin.toFixed(3) + "g";
+  document.getElementById("res-valeur").textContent = val.toLocaleString("fr-FR",  { style:"currency", currency:"EUR" });
+  document.getElementById("res-prix").textContent   = prix.toLocaleString("fr-FR", { style:"currency", currency:"EUR" });
+  document.getElementById("res-marge").textContent  = marge.toLocaleString("fr-FR",{ style:"currency", currency:"EUR" });
+}
+function calcTax() {
+  var v = parseFloat(document.getElementById("t-vente").value)  || 0;
+  var a = parseFloat(document.getElementById("t-achat").value)  || 0;
+  var y = parseInt(document.getElementById("t-annees").value)   || 0;
+  var tmp = v * 0.115;
+  document.getElementById("tmp-base").textContent = "Base : " + v.toLocaleString("fr-FR",{style:"currency",currency:"EUR"}) + " x 11,5%";
+  document.getElementById("tmp-taxe").textContent = tmp.toLocaleString("fr-FR",{style:"currency",currency:"EUR"});
+  document.getElementById("tmp-net").textContent  = "Net percu : " + (v - tmp).toLocaleString("fr-FR",{style:"currency",currency:"EUR"});
+  var abat = y >= 22 ? 100 : y >= 3 ? (y-2)*5 : 0;
+  var pv   = Math.max(0, v - a);
+  var pvN  = pv * (1 - abat/100);
+  var tpv  = pvN * 0.362;
+  document.getElementById("tpv-pct").textContent  = abat;
+  document.getElementById("tpv-pv").textContent   = "PV brute : " + pv.toLocaleString("fr-FR",{style:"currency",currency:"EUR"});
+  document.getElementById("tpv-abat").textContent = "Reduction : -" + (pv*abat/100).toLocaleString("fr-FR",{style:"currency",currency:"EUR"});
+  document.getElementById("tpv-taxe").textContent = y >= 22 ? "0,00 € (exonere)" : tpv.toLocaleString("fr-FR",{style:"currency",currency:"EUR"});
+  document.getElementById("tpv-net").textContent  = "Net percu : " + (v - tpv).toLocaleString("fr-FR",{style:"currency",currency:"EUR"});
+  var c2 = document.getElementById("tax-conseil");
+  if (y >= 22) { c2.style.background="#f0fae8"; c2.style.color="#27500A"; c2.textContent = "Exoneration totale — TPV obligatoirement plus avantageuse." }
+  else if (tmp < tpv) { c2.style.background="#fff5f5"; c2.style.color="#a32d2d"; c2.textContent = "TMP (" + tmp.toLocaleString("fr-FR",{style:"currency",currency:"EUR"}) + ") plus avantageux que TPV (" + tpv.toLocaleString("fr-FR",{style:"currency",currency:"EUR"}) + ")." }
+  else { c2.style.background="#f0fae8"; c2.style.color="#27500A"; c2.textContent = "TPV (" + tpv.toLocaleString("fr-FR",{style:"currency",currency:"EUR"}) + ") plus avantageux que TMP (" + tmp.toLocaleString("fr-FR",{style:"currency",currency:"EUR"}) + ")." }
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+document.addEventListener("DOMContentLoaded", function() {
+  var pwd = document.getElementById("inp-pwd");
+  var nom = document.getElementById("inp-nom");
+  if (pwd) pwd.addEventListener("keydown", function(e) { if (e.key === "Enter") doLogin() });
+  if (nom) nom.addEventListener("keydown", function(e) { if (e.key === "Enter") { var p = document.getElementById("inp-poste"); if (p) p.focus() } });
+});
+
+</script>
+</body>
+</html>
